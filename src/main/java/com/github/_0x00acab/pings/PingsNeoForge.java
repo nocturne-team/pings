@@ -18,7 +18,7 @@ public class PingsNeoForge {
     }
 
     private static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1");
+        PayloadRegistrar registrar = event.registrar("1").optional();
         registrar.playToServer(PingRequestPayload.TYPE, PingRequestPayload.STREAM_CODEC,
             (payload, context) -> PingsMod.requestHandler().handle((ServerPlayer) context.player(), payload));
         registrar.playToClient(PingBroadcastPayload.TYPE, PingBroadcastPayload.STREAM_CODEC);

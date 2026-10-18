@@ -11,6 +11,9 @@ authors = "0x00ACAB"
 description = "Ping locations and mobs for your team, with a quick-ping key and a ping wheel."
 iconFile = "assets/pings/icon.png"
 
+[[accessTransformers]]
+file = "META-INF/accesstransformer.cfg"
+
 [[dependencies.${id}]]
 modId = "minecraft"
 type = "required"

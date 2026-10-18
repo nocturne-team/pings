@@ -29,7 +29,7 @@ public final class PingTargeting {
         Vec3 end = eye.add(look.scale(reach));
         AABB sweep = camera.getBoundingBox().expandTowards(look.scale(reach)).inflate(1.0);
         EntityHitResult entityHit = ProjectileUtil.getEntityHitResult(camera, eye, end, sweep,
-            entity -> !entity.isSpectator() && entity.isPickable(), reach * reach);
+            entity -> !entity.isSpectator() && entity.isPickable() && !entity.isInvisibleTo(minecraft.player), reach * reach);
 
         if (entityHit != null) {
             Entity entity = entityHit.getEntity();

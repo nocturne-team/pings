@@ -9,7 +9,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 
 public final class PingClient {
-    public static final KeyMapping QUICK_PING_KEY = new KeyMapping("key.pings.quick_ping", InputConstants.KEY_G, KeyMapping.Category.MULTIPLAYER);
+    public static final KeyMapping QUICK_PING_KEY = new KeyMapping("key.pings.quick_ping", InputConstants.KEY_Z, KeyMapping.Category.MULTIPLAYER);
     public static final KeyMapping WHEEL_KEY = new KeyMapping("key.pings.ping_wheel", InputConstants.KEY_R, KeyMapping.Category.MULTIPLAYER);
     public static final PingTracker TRACKER = new PingTracker(() -> System.nanoTime() / 1_000_000L);
 
@@ -30,8 +30,9 @@ public final class PingClient {
             sendPing(minecraft, PingCategory.PLAIN);
         }
         while (WHEEL_KEY.consumeClick()) {
-            if (minecraft.gui.screen() == null) {
-                minecraft.setScreenAndShow(new PingWheelScreen(WHEEL_KEY));
+            // A tap shorter than a tick is already released here and would leave the wheel stuck open.
+            if (minecraft.gui.screen() == null && WHEEL_KEY.isDown()) {
+                minecraft.gui.setScreen(new PingWheelScreen(WHEEL_KEY));
             }
         }
     }
@@ -46,6 +47,7 @@ public final class PingClient {
     public static void receive(PingBroadcastPayload payload) {
         PingCategory category = PingCategory.byId(payload.categoryId());
         if (category != null) {
+            TRACKER.ensureLevel(Minecraft.getInstance().level);
             TRACKER.add(payload.position(), payload.entityId(), category, payload.color());
         }
     }

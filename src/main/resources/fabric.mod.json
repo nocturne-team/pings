@@ -12,6 +12,7 @@
 		"main": ["com.github._0x00acab.pings.PingsFabric"],
 		"client": ["com.github._0x00acab.pings.PingsFabricClient"]
 	},
+	"accessWidener": "pings.ct",
 	"depends": {
 		"fabricloader": ">=${loader}",
 		"minecraft": "${minecraft}",

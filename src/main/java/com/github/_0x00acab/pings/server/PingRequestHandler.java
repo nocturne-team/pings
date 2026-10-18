@@ -31,7 +31,7 @@ public final class PingRequestHandler {
         int entityId = PingRequestPayload.NO_ENTITY;
         if (request.entityId() != PingRequestPayload.NO_ENTITY) {
             Entity entity = sender.level().getEntity(request.entityId());
-            if (entity != null && !entity.isRemoved()) {
+            if (entity != null && !entity.isRemoved() && !entity.isInvisibleTo(sender)) {
                 target = entity.position().add(0, entity.getBbHeight() + PingBroadcastPayload.ENTITY_MARKER_OFFSET, 0);
                 entityId = entity.getId();
             }

@@ -33,6 +33,7 @@ dependencies {
 
 loom {
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
+    accessWidenerPath = rootProject.file("src/main/resources/pings.ct")
 
     runConfigs.all {
         preferGradleTask = true
@@ -72,7 +73,7 @@ tasks {
         }
 
         filesMatching("fabric.mod.json") { expand(props) }
-        exclude("META-INF/neoforge.mods.toml")
+        exclude("META-INF/neoforge.mods.toml", "META-INF/accesstransformer.cfg")
     }
 
     withType<Jar> {

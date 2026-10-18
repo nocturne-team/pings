@@ -13,8 +13,8 @@ import net.minecraft.network.chat.Component;
 public final class PingWheelScreen extends Screen {
     private static final int RADIUS = 60;
     private static final int DEAD_ZONE = 15;
-    private static final int TILE_HALF = 14;
-    private static final int ICON = 16;
+    private static final int TILE_HALF = 16;
+    private static final int ICON = 26;
 
     private final KeyMapping holdKey;
     private double lastMouseX;

@@ -25,7 +25,9 @@ public sealed interface ModLoaderAccess {
 
         @Override
         public void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {
-            net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, payload);
+            if (net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.canSend(player, payload.type())) {
+                net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, payload);
+            }
         }
     }
     //?} else {
@@ -37,7 +39,9 @@ public sealed interface ModLoaderAccess {
 
         @Override
         public void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {
-            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, payload);
+            if (player.connection.hasChannel(payload)) {
+                net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, payload);
+            }
         }
     }
     *///?}

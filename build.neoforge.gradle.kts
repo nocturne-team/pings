@@ -15,6 +15,7 @@ dependencies {
 
 neoForge {
     version = property("deps.neo_loader") as String
+    accessTransformers.from(rootProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
 
     mods {
         register("pings") {
@@ -61,7 +62,7 @@ tasks {
         }
 
         filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
-        exclude("fabric.mod.json")
+        exclude("fabric.mod.json", "*.ct")
     }
 
     named("createMinecraftArtifacts") {
