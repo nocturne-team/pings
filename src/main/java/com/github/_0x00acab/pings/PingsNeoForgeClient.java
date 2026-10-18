@@ -33,7 +33,7 @@ public class PingsNeoForgeClient {
         modEventBus.addListener((RegisterClientPayloadHandlersEvent event) ->
             event.register(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload)));
         modEventBus.addListener((RegisterGuiLayersEvent event) ->
-            event.registerBelow(VanillaGuiLayers.CHAT, PingsMod.id("markers"), PingHud::render));
+            event.registerBelow(VanillaGuiLayers.CROSSHAIR, PingsMod.id("markers"), PingHud::render));
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> PingClient.tick(Minecraft.getInstance()));
     }
 }

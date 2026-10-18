@@ -24,7 +24,7 @@ public class PingsFabricClient implements ClientModInitializer {
         KeyMappingHelper.registerKeyMapping(PingClient.WHEEL_KEY);
         ClientTickEvents.END_CLIENT_TICK.register(PingClient::tick);
         ClientPlayNetworking.registerGlobalReceiver(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
-        HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, PingsMod.id("markers"), PingHud::render);
+        HudElementRegistry.attachElementBefore(VanillaHudElements.CROSSHAIR, PingsMod.id("markers"), PingHud::render);
     }
 }
 //?}
