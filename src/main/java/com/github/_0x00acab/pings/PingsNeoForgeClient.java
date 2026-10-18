@@ -4,6 +4,7 @@ package com.github._0x00acab.pings;
 /*import com.github._0x00acab.pings.client.PingClient;
 import com.github._0x00acab.pings.client.PingHud;
 import com.github._0x00acab.pings.network.PingBroadcastPayload;
+import com.github._0x00acab.pings.network.PingConfigSyncPayload;
 import com.github._0x00acab.pings.network.PingRequestPayload;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -30,8 +31,10 @@ public class PingsNeoForgeClient {
             event.register(PingClient.QUICK_PING_KEY);
             event.register(PingClient.WHEEL_KEY);
         });
-        modEventBus.addListener((RegisterClientPayloadHandlersEvent event) ->
-            event.register(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload)));
+        modEventBus.addListener((RegisterClientPayloadHandlersEvent event) -> {
+            event.register(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
+            event.register(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
+        });
         modEventBus.addListener((RegisterGuiLayersEvent event) ->
             event.registerBelow(VanillaGuiLayers.CROSSHAIR, PingsMod.id("markers"), PingHud::render));
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> PingClient.tick(Minecraft.getInstance()));

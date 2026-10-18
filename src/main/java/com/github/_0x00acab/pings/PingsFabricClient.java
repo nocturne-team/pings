@@ -4,6 +4,7 @@ package com.github._0x00acab.pings;
 import com.github._0x00acab.pings.client.PingClient;
 import com.github._0x00acab.pings.client.PingHud;
 import com.github._0x00acab.pings.network.PingBroadcastPayload;
+import com.github._0x00acab.pings.network.PingConfigSyncPayload;
 import com.github._0x00acab.pings.network.PingRequestPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -24,6 +25,7 @@ public class PingsFabricClient implements ClientModInitializer {
         KeyMappingHelper.registerKeyMapping(PingClient.WHEEL_KEY);
         ClientTickEvents.END_CLIENT_TICK.register(PingClient::tick);
         ClientPlayNetworking.registerGlobalReceiver(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
+        ClientPlayNetworking.registerGlobalReceiver(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
         HudElementRegistry.attachElementBefore(VanillaHudElements.CROSSHAIR, PingsMod.id("markers"), PingHud::render);
     }
 }

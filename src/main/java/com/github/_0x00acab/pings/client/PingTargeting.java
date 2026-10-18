@@ -11,9 +11,24 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 public final class PingTargeting {
-    public static final double MAX_DISTANCE = 256.0;
+    // Fallback used until the server tells us its configured max_ping_distance (or on a vanilla/unmodded server).
+    public static final double DEFAULT_MAX_DISTANCE = 256.0;
+
+    private static double maxDistance = DEFAULT_MAX_DISTANCE;
 
     private PingTargeting() {}
+
+    public static double maxDistance() {
+        return maxDistance;
+    }
+
+    public static void setMaxDistance(double distance) {
+        maxDistance = distance;
+    }
+
+    public static void resetMaxDistance() {
+        maxDistance = DEFAULT_MAX_DISTANCE;
+    }
 
     public static PingRequestPayload target(Minecraft minecraft, PingCategory category) {
         Entity camera = minecraft.getCameraEntity();
@@ -21,10 +36,10 @@ public final class PingTargeting {
             return null;
         }
         float partial = minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true);
-        HitResult blockHit = camera.pick(MAX_DISTANCE, partial, false);
+        HitResult blockHit = camera.pick(maxDistance, partial, false);
         Vec3 eye = camera.getEyePosition(partial);
         Vec3 look = camera.getViewVector(partial);
-        double reach = blockHit.getType() == HitResult.Type.MISS ? MAX_DISTANCE : blockHit.getLocation().distanceTo(eye);
+        double reach = blockHit.getType() == HitResult.Type.MISS ? maxDistance : blockHit.getLocation().distanceTo(eye);
 
         Vec3 end = eye.add(look.scale(reach));
         AABB sweep = camera.getBoundingBox().expandTowards(look.scale(reach)).inflate(1.0);

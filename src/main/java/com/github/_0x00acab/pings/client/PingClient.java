@@ -2,6 +2,7 @@ package com.github._0x00acab.pings.client;
 
 import com.github._0x00acab.pings.PingCategory;
 import com.github._0x00acab.pings.network.PingBroadcastPayload;
+import com.github._0x00acab.pings.network.PingConfigSyncPayload;
 import com.github._0x00acab.pings.network.PingRequestPayload;
 import com.mojang.blaze3d.platform.InputConstants;
 import java.util.function.Consumer;
@@ -23,6 +24,10 @@ public final class PingClient {
 
     public static void tick(Minecraft minecraft) {
         TRACKER.ensureLevel(minecraft.level);
+        if (minecraft.level == null) {
+            // Back at the title screen or between servers; drop any distance limit synced from the last one.
+            PingTargeting.resetMaxDistance();
+        }
         if (minecraft.player == null) {
             return;
         }
@@ -44,6 +49,10 @@ public final class PingClient {
         if (request != null) {
             sender.accept(request);
         }
+    }
+
+    public static void receiveConfig(PingConfigSyncPayload payload) {
+        PingTargeting.setMaxDistance(payload.maxPingDistance());
     }
 
     public static void receive(PingBroadcastPayload payload) {

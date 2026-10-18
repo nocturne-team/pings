@@ -45,5 +45,17 @@ class PayloadCodecTest {
     void payloadIdsAreNamespaced() {
         assertEquals("pings:ping_request", PingRequestPayload.TYPE.id().toString());
         assertEquals("pings:ping_broadcast", PingBroadcastPayload.TYPE.id().toString());
+        assertEquals("pings:config_sync", PingConfigSyncPayload.TYPE.id().toString());
+    }
+
+    @Test
+    void configSyncRoundTripsMaxDistance() {
+        PingConfigSyncPayload original = new PingConfigSyncPayload(96.0);
+        ByteBuf buf = Unpooled.buffer();
+
+        PingConfigSyncPayload.STREAM_CODEC.encode(buf, original);
+
+        assertEquals(original, PingConfigSyncPayload.STREAM_CODEC.decode(buf));
+        assertEquals(0, buf.readableBytes());
     }
 }

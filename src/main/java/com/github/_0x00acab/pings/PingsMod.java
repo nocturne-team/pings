@@ -13,6 +13,7 @@ public final class PingsMod {
     public static final String VERSION = /*$ mod_version*/ "0.1.0";
     public static final String MINECRAFT = /*$ minecraft*/ "26.3";
 
+    private static PingsConfig config;
     private static PingRequestHandler requestHandler;
 
     private PingsMod() {}
@@ -22,9 +23,13 @@ public final class PingsMod {
     }
 
     public static void init() {
-        PingsConfig config = PingsConfig.load(ModLoaderAccess.INSTANCE.getConfigDir().resolve("pings.properties"));
+        config = PingsConfig.load(ModLoaderAccess.INSTANCE.getConfigDir().resolve("pings.properties"));
         requestHandler = new PingRequestHandler(config, new PingRateLimiter(config, () -> System.nanoTime() / 1_000_000L), new VanillaTeamProvider());
         LOGGER.info("Pings loaded");
+    }
+
+    public static PingsConfig config() {
+        return config;
     }
 
     public static PingRequestHandler requestHandler() {
