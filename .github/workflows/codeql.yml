@@ -24,11 +24,11 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - uses: github/codeql-action/init@v3
+      - uses: github/codeql-action/init@v4
         with:
           languages: java-kotlin
 
       - name: Compile both loaders
         run: ./gradlew :26.3-fabric:compileJava :26.3-neoforge:compileJava
 
-      - uses: github/codeql-action/analyze@v3
+      - uses: github/codeql-action/analyze@v4
