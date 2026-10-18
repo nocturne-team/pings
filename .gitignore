@@ -37,3 +37,6 @@ result-*
 
 # superpowers scratch
 .superpowers/
+
+# game logs from dev runs
+logs/
