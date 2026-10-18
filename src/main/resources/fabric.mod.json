@@ -1,0 +1,23 @@
+{
+	"schemaVersion": 1,
+	"id": "${id}",
+	"version": "${version}",
+	"name": "${name}",
+	"description": "Ping locations and mobs for your team, with a quick-ping key and a ping wheel.",
+	"authors": ["0x00ACAB"],
+	"license": "CC0-1.0",
+	"icon": "assets/pings/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": ["com.github._0x00acab.pings.PingsFabric"],
+		"client": ["com.github._0x00acab.pings.PingsFabricClient"]
+	},
+	"depends": {
+		"fabricloader": ">=${loader}",
+		"minecraft": "${minecraft}",
+		"fabric-networking-api-v1": "*",
+		"fabric-key-mapping-api-v1": "*",
+		"fabric-lifecycle-events-v1": "*",
+		"fabric-rendering-v1": "*"
+	}
+}
