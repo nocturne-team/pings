@@ -76,7 +76,11 @@ tasks {
 
     test {
         useJUnitPlatform()
-        // Lets tests use Minecraft classes without booting FML.
-        classpath += sourceSets.main.get().compileClasspath
     }
+}
+
+// Lets tests use Minecraft classes without booting FML.
+sourceSets.test {
+    compileClasspath += sourceSets.main.get().compileClasspath
+    runtimeClasspath += sourceSets.main.get().compileClasspath
 }
