@@ -1,0 +1,11 @@
+{
+  "key.pings.quick_ping": "Quick Ping",
+  "key.pings.ping_wheel": "Ping Wheel",
+  "pings.wheel.title": "Ping Wheel",
+  "pings.category.plain": "Ping",
+  "pings.category.danger": "Danger",
+  "pings.category.look_here": "Look Here",
+  "pings.category.come_here": "Come Here",
+  "pings.category.need_help": "Need Help",
+  "pings.category.mining": "Mining/Resource"
+}

@@ -9,7 +9,7 @@ displayName = "${name}"
 version = "${version}"
 authors = "0x00ACAB"
 description = "Ping locations and mobs for your team, with a quick-ping key and a ping wheel."
-logoFile = "assets/pings/icon.png"
+iconFile = "assets/pings/icon.png"
 
 [[dependencies.${id}]]
 modId = "minecraft"
