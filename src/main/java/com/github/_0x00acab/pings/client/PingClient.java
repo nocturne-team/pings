@@ -33,6 +33,8 @@ public final class PingClient {
             // A tap shorter than a tick is already released here and would leave the wheel stuck open.
             if (minecraft.gui.screen() == null && WHEEL_KEY.isDown()) {
                 minecraft.gui.setScreen(new PingWheelScreen(WHEEL_KEY));
+                // Opening a screen releases every key; re-read held keys so walking continues.
+                KeyMapping.setAll();
             }
         }
     }

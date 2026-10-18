@@ -4,13 +4,14 @@ import com.github._0x00acab.pings.PingCategory;
 import java.util.List;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.debug.GameModeSwitcherScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 
-public final class PingWheelScreen extends Screen {
+// Subclassed only because KeyboardHandler passes keys through for this type; all parent behavior is overridden.
+public final class PingWheelScreen extends GameModeSwitcherScreen {
     private static final int RADIUS = 60;
     private static final int DEAD_ZONE = 15;
     private static final int TILE_HALF = 16;
@@ -21,8 +22,11 @@ public final class PingWheelScreen extends Screen {
     private double lastMouseY;
 
     public PingWheelScreen(KeyMapping holdKey) {
-        super(Component.translatable("pings.wheel.title"));
         this.holdKey = holdKey;
+    }
+
+    @Override
+    protected void init() {
     }
 
     @Override
@@ -54,13 +58,23 @@ public final class PingWheelScreen extends Screen {
         }
     }
 
+    // Returning false hands the key to the game, so movement keys keep working.
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (event.isEscape()) {
+            onClose();
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean keyReleased(KeyEvent event) {
         if (holdKey.matches(event)) {
             commit(lastMouseX, lastMouseY);
             return true;
         }
-        return super.keyReleased(event);
+        return false;
     }
 
     @Override
@@ -69,7 +83,7 @@ public final class PingWheelScreen extends Screen {
             commit(event.x(), event.y());
             return true;
         }
-        return super.mouseReleased(event);
+        return false;
     }
 
     @Override
@@ -78,7 +92,7 @@ public final class PingWheelScreen extends Screen {
             commit(event.x(), event.y());
             return true;
         }
-        return super.mouseClicked(event, doubleClick);
+        return false;
     }
 
     private PingCategory hovered(double mouseX, double mouseY) {
