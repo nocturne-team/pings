@@ -39,7 +39,7 @@ public final class PingHud {
             Vec3 relative = target.subtract(cameraPos);
             boolean inFront = relative.x * forward.x() + relative.y * forward.y() + relative.z * forward.z() > 0;
             Vec3 ndc = minecraft.gameRenderer.projectPointToScreen(target);
-            MarkerMath.Placement placement = MarkerMath.place(ndc.x, ndc.y, inFront, graphics.guiWidth(), graphics.guiHeight(), EDGE_MARGIN);
+            MarkerMath.Placement placement = MarkerMath.place(ndc.x, ndc.y, inFront ? 1 : -1, graphics.guiWidth(), graphics.guiHeight(), EDGE_MARGIN);
             String distance = MarkerMath.formatDistance(relative.length());
             if (placement.onScreen()) {
                 drawDiamond(graphics, minecraft, placement, ping, distance);

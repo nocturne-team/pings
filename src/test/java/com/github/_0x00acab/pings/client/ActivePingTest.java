@@ -15,7 +15,15 @@ class ActivePingTest {
     }
 
     @Test
-    void fallsBackToLastKnownPositionWhenEntityIsGone() {
+    void staysWhereTheEntityWasLastSeenAfterItDisappears() {
+        ping.renderPosition(new Vec3(5, 2, 3));
+        ping.renderPosition(new Vec3(9, 2, 3));
+
+        assertEquals(new Vec3(9, 2, 3), ping.renderPosition(null));
+    }
+
+    @Test
+    void usesPingTimePositionWhenEntityWasNeverSeen() {
         assertEquals(new Vec3(1, 2, 3), ping.renderPosition(null));
     }
 }

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MarkerMathTest {
@@ -14,15 +15,15 @@ class MarkerMathTest {
 
     @Test
     void centeredPingInFrontIsOnScreenAtCenter() {
-        MarkerMath.Placement p = MarkerMath.place(0, 0, true, W, H, MARGIN);
+        MarkerMath.Placement p = MarkerMath.place(0, 0, 1, W, H, MARGIN);
         assertTrue(p.onScreen());
         assertEquals(200, p.x(), EPS);
         assertEquals(100, p.y(), EPS);
     }
 
     @Test
-    void ndcMapsToGuiCoordinatesWithYFlipped() {
-        MarkerMath.Placement p = MarkerMath.place(0.5, 0.5, true, W, H, MARGIN);
+    void clipCoordinatesAreDividedByWAndYIsFlipped() {
+        MarkerMath.Placement p = MarkerMath.place(1, 1, 2, W, H, MARGIN);
         assertTrue(p.onScreen());
         assertEquals(300, p.x(), EPS);
         assertEquals(50, p.y(), EPS);
@@ -30,7 +31,7 @@ class MarkerMathTest {
 
     @Test
     void pingFarRightClampsToRightEdgePointingRight() {
-        MarkerMath.Placement p = MarkerMath.place(3, 0, true, W, H, MARGIN);
+        MarkerMath.Placement p = MarkerMath.place(3, 0, 1, W, H, MARGIN);
         assertFalse(p.onScreen());
         assertEquals(W - MARGIN, p.x(), EPS);
         assertEquals(100, p.y(), EPS);
@@ -39,12 +40,12 @@ class MarkerMathTest {
 
     @Test
     void pingInsideMarginCountsAsOffScreen() {
-        assertFalse(MarkerMath.place(0.99, 0, true, W, H, MARGIN).onScreen());
+        assertFalse(MarkerMath.place(0.99, 0, 1, W, H, MARGIN).onScreen());
     }
 
     @Test
     void pingDirectlyBehindPointsDownAtBottomEdge() {
-        MarkerMath.Placement p = MarkerMath.place(0, 0, false, W, H, MARGIN);
+        MarkerMath.Placement p = MarkerMath.place(0, 0, -1, W, H, MARGIN);
         assertFalse(p.onScreen());
         assertEquals(200, p.x(), EPS);
         assertEquals(H - MARGIN, p.y(), EPS);
@@ -52,11 +53,42 @@ class MarkerMathTest {
     }
 
     @Test
-    void pingBehindAndToTheRightIsMirroredToTheLeft() {
-        MarkerMath.Placement p = MarkerMath.place(0.5, 0, false, W, H, MARGIN);
+    void pingAlmostDirectlyBehindStaysAtBottomInsteadOfFlippingSides() {
+        MarkerMath.Placement left = MarkerMath.place(-0.01, 0, -1, W, H, MARGIN);
+        MarkerMath.Placement right = MarkerMath.place(0.01, 0, -1, W, H, MARGIN);
+        assertEquals(H - MARGIN, left.y(), EPS);
+        assertEquals(H - MARGIN, right.y(), EPS);
+    }
+
+    @Test
+    void pingBehindAndToTheRightPointsRight() {
+        MarkerMath.Placement p = MarkerMath.place(0.5, 0, -1, W, H, MARGIN);
         assertFalse(p.onScreen());
-        assertEquals(MARGIN, p.x(), EPS);
-        assertEquals(Math.PI, Math.abs(p.arrowAngle()), EPS);
+        assertEquals(W - MARGIN, p.x(), EPS);
+        assertEquals(0, p.arrowAngle(), EPS);
+    }
+
+    @Test
+    void pingInTheCameraPlanePointsTowardItWithoutNaN() {
+        MarkerMath.Placement p = MarkerMath.place(0, 5, 0, W, H, MARGIN);
+        assertFalse(p.onScreen());
+        assertEquals(200, p.x(), EPS);
+        assertEquals(MARGIN, p.y(), EPS);
+        assertEquals(-Math.PI / 2, p.arrowAngle(), EPS);
+    }
+
+    @Test
+    void nonFiniteProjectionIsSkipped() {
+        assertNull(MarkerMath.place(Double.NaN, 0, 1, W, H, MARGIN));
+        assertNull(MarkerMath.place(0, 0, Double.POSITIVE_INFINITY, W, H, MARGIN));
+    }
+
+    @Test
+    void markersShrinkWithDistanceDownToAFloor() {
+        assertEquals(1.0, MarkerMath.markerScale(3), EPS);
+        assertEquals(1.0, MarkerMath.markerScale(8), EPS);
+        assertEquals(0.5, MarkerMath.markerScale(16), EPS);
+        assertEquals(MarkerMath.MIN_SCALE, MarkerMath.markerScale(500), EPS);
     }
 
     @Test
