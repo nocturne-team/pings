@@ -31,7 +31,7 @@ public final class PingRequestHandler {
         int entityId = PingRequestPayload.NO_ENTITY;
         if (request.entityId() != PingRequestPayload.NO_ENTITY) {
             Entity entity = sender.level().getEntity(request.entityId());
-            if (entity != null && !entity.isRemoved() && !entity.isInvisibleTo(sender)) {
+            if (entity != null && !entity.isRemoved() && !entity.isInvisibleTo(sender) && isTrackedBy(sender, entity)) {
                 target = entity.position().add(0, entity.getBbHeight() + PingBroadcastPayload.ENTITY_MARKER_OFFSET, 0);
                 entityId = entity.getId();
             }
@@ -48,6 +48,14 @@ public final class PingRequestHandler {
         for (ServerPlayer recipient : recipients(sender)) {
             ModLoaderAccess.INSTANCE.sendToPlayer(recipient, broadcast);
         }
+    }
+
+    // Only entities the server already sends to this player can be pinged; otherwise a modified client could
+    // guess entity ids and get back positions of entities outside its tracking range.
+    private static boolean isTrackedBy(ServerPlayer player, Entity entity) {
+        boolean[] tracked = {false};
+        player.level().getChunkSource().chunkMap.forEachEntityTrackedBy(player, seen -> tracked[0] |= seen == entity);
+        return tracked[0];
     }
 
     static boolean isValidTarget(Vec3 eye, Vec3 target, double maxDistance) {
