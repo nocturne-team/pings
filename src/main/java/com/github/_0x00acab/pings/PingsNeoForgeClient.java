@@ -20,24 +20,24 @@ import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(value = PingsMod.MOD_ID, dist = Dist.CLIENT)
 public class PingsNeoForgeClient {
-    public PingsNeoForgeClient(IEventBus modEventBus) {
-        PingClient.init(request -> {
-            var connection = Minecraft.getInstance().getConnection();
-            if (connection != null && connection.hasChannel(PingRequestPayload.TYPE)) {
-                ClientPacketDistributor.sendToServer(request);
-            }
-        });
-        modEventBus.addListener((RegisterKeyMappingsEvent event) -> {
-            event.register(PingClient.QUICK_PING_KEY);
-            event.register(PingClient.WHEEL_KEY);
-        });
-        modEventBus.addListener((RegisterClientPayloadHandlersEvent event) -> {
-            event.register(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
-            event.register(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
-        });
-        modEventBus.addListener((RegisterGuiLayersEvent event) ->
-            event.registerBelow(VanillaGuiLayers.CROSSHAIR, PingsMod.id("markers"), PingHud::render));
-        NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> PingClient.tick(Minecraft.getInstance()));
-    }
+	public PingsNeoForgeClient(IEventBus modEventBus) {
+		PingClient.init(request -> {
+			var connection = Minecraft.getInstance().getConnection();
+			if (connection != null && connection.hasChannel(PingRequestPayload.TYPE)) {
+				ClientPacketDistributor.sendToServer(request);
+			}
+		});
+		modEventBus.addListener((RegisterKeyMappingsEvent event) -> {
+			event.register(PingClient.QUICK_PING_KEY);
+			event.register(PingClient.WHEEL_KEY);
+		});
+		modEventBus.addListener((RegisterClientPayloadHandlersEvent event) -> {
+			event.register(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
+			event.register(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
+		});
+		modEventBus.addListener((RegisterGuiLayersEvent event) ->
+			event.registerBelow(VanillaGuiLayers.CROSSHAIR, PingsMod.id("markers"), PingHud::render));
+		NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> PingClient.tick(Minecraft.getInstance()));
+	}
 }
 *///?}
