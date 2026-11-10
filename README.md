@@ -1,4 +1,4 @@
-# Pings
+# Callouts
 
 A multiplayer ping mod for Minecraft: mark locations or entities for your
 team (or nearby players), visible through walls via an edge-of-screen
@@ -29,6 +29,7 @@ resistant to client-side cheats.
 
 Requires Minecraft 26.3, on **Fabric** (with [Fabric API](https://modrinth.com/mod/fabric-api))
 or **NeoForge**. Grab the right jar for your loader from
+[Modrinth](https://modrinth.com/project/callouts) or
 [Releases](../../releases).
 
 Install it on the server and on every client that wants to send or see
@@ -45,7 +46,7 @@ there.
 
 ## Server config
 
-Written to `config/pings.properties` on first run:
+Written to `config/callouts.properties` on first run:
 
 | Key                    | Default  | Meaning                                   |
 |-------------------------|----------|--------------------------------------------|

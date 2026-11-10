@@ -33,7 +33,7 @@ dependencies {
 
 loom {
 	fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json")
-	accessWidenerPath = rootProject.file("src/main/resources/pings.ct")
+	accessWidenerPath = rootProject.file("src/main/resources/callouts.ct")
 
 	runConfigs.all {
 		preferGradleTask = true

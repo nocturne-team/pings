@@ -1,0 +1,11 @@
+{
+	"key.callouts.quick_ping": "Quick Ping",
+	"key.callouts.ping_wheel": "Ping Wheel",
+	"callouts.wheel.title": "Ping Wheel",
+	"callouts.category.plain": "Ping",
+	"callouts.category.danger": "Danger",
+	"callouts.category.look_here": "Look Here",
+	"callouts.category.come_here": "Come Here",
+	"callouts.category.need_help": "Need Help",
+	"callouts.category.mining": "Mining/Resource"
+}
