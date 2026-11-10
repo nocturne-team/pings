@@ -1,5 +1,5 @@
 {
-  description = "Dev environment for Pings (Stonecutter Fabric/NeoForge mod)";
+  description = "Dev environment for Callouts (Stonecutter Fabric/NeoForge mod)";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -23,7 +23,7 @@
           JAVA_HOME = "${pkgs.jdk21}/lib/openjdk";
 
           shellHook = ''
-            echo "Pings dev shell: JDK $(java -version 2>&1 | head -n1)"
+            echo "Callouts dev shell: JDK $(java -version 2>&1 | head -n1)"
             echo "Run ./gradlew :<version>-<loader>:build to build a specific target."
           '';
         };

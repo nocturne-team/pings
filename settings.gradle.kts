@@ -36,4 +36,4 @@ stonecutter {
 	}
 }
 
-rootProject.name = "Pings"
+rootProject.name = "Callouts"

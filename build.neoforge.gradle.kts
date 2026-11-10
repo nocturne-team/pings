@@ -18,7 +18,7 @@ neoForge {
 	accessTransformers.from(rootProject.file("src/main/resources/META-INF/accesstransformer.cfg"))
 
 	mods {
-		register("pings") {
+		register("callouts") {
 			sourceSet(sourceSets.main.get())
 		}
 	}

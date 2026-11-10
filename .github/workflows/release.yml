@@ -38,5 +38,5 @@ jobs:
           prerelease=""
           case "$GITHUB_REF_NAME" in *-*) prerelease="--prerelease" ;; esac
           gh release create "$GITHUB_REF_NAME" $prerelease --generate-notes \
-            versions/26.3-fabric/build/libs/pings-fabric-*+26.3.jar \
-            versions/26.3-neoforge/build/libs/pings-neoforge-*+26.3.jar
+            versions/26.3-fabric/build/libs/callouts-fabric-*+26.3.jar \
+            versions/26.3-neoforge/build/libs/callouts-neoforge-*+26.3.jar
