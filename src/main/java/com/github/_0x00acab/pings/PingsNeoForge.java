@@ -15,20 +15,20 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 @Mod(PingsMod.MOD_ID)
 public class PingsNeoForge {
-    public PingsNeoForge(IEventBus modEventBus, ModContainer modContainer) {
-        PingsMod.init();
-        modEventBus.addListener(PingsNeoForge::registerPayloads);
-        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) ->
-            ModLoaderAccess.INSTANCE.sendToPlayer((ServerPlayer) event.getEntity(),
-                new PingConfigSyncPayload(PingsMod.config().maxPingDistance())));
-    }
+	public PingsNeoForge(IEventBus modEventBus, ModContainer modContainer) {
+		PingsMod.init();
+		modEventBus.addListener(PingsNeoForge::registerPayloads);
+		NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) ->
+			ModLoaderAccess.INSTANCE.sendToPlayer((ServerPlayer) event.getEntity(),
+				new PingConfigSyncPayload(PingsMod.config().maxPingDistance())));
+	}
 
-    private static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar("1").optional();
-        registrar.playToServer(PingRequestPayload.TYPE, PingRequestPayload.STREAM_CODEC,
-            (payload, context) -> PingsMod.requestHandler().handle((ServerPlayer) context.player(), payload));
-        registrar.playToClient(PingBroadcastPayload.TYPE, PingBroadcastPayload.STREAM_CODEC);
-        registrar.playToClient(PingConfigSyncPayload.TYPE, PingConfigSyncPayload.STREAM_CODEC);
-    }
+	private static void registerPayloads(RegisterPayloadHandlersEvent event) {
+		PayloadRegistrar registrar = event.registrar("1").optional();
+		registrar.playToServer(PingRequestPayload.TYPE, PingRequestPayload.STREAM_CODEC,
+			(payload, context) -> PingsMod.requestHandler().handle((ServerPlayer) context.player(), payload));
+		registrar.playToClient(PingBroadcastPayload.TYPE, PingBroadcastPayload.STREAM_CODEC);
+		registrar.playToClient(PingConfigSyncPayload.TYPE, PingConfigSyncPayload.STREAM_CODEC);
+	}
 }
 *///?}

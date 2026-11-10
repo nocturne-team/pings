@@ -14,19 +14,19 @@ import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 
 public class PingsFabricClient implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
-        PingClient.init(request -> {
-            if (ClientPlayNetworking.canSend(PingRequestPayload.TYPE)) {
-                ClientPlayNetworking.send(request);
-            }
-        });
-        KeyMappingHelper.registerKeyMapping(PingClient.QUICK_PING_KEY);
-        KeyMappingHelper.registerKeyMapping(PingClient.WHEEL_KEY);
-        ClientTickEvents.END_CLIENT_TICK.register(PingClient::tick);
-        ClientPlayNetworking.registerGlobalReceiver(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
-        ClientPlayNetworking.registerGlobalReceiver(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
-        HudElementRegistry.attachElementBefore(VanillaHudElements.CROSSHAIR, PingsMod.id("markers"), PingHud::render);
-    }
+	@Override
+	public void onInitializeClient() {
+		PingClient.init(request -> {
+			if (ClientPlayNetworking.canSend(PingRequestPayload.TYPE)) {
+				ClientPlayNetworking.send(request);
+			}
+		});
+		KeyMappingHelper.registerKeyMapping(PingClient.QUICK_PING_KEY);
+		KeyMappingHelper.registerKeyMapping(PingClient.WHEEL_KEY);
+		ClientTickEvents.END_CLIENT_TICK.register(PingClient::tick);
+		ClientPlayNetworking.registerGlobalReceiver(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
+		ClientPlayNetworking.registerGlobalReceiver(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
+		HudElementRegistry.attachElementBefore(VanillaHudElements.CROSSHAIR, PingsMod.id("markers"), PingHud::render);
+	}
 }
 //?}

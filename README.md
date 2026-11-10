@@ -27,8 +27,14 @@ resistant to client-side cheats.
 
 ## Install
 
-Requires Minecraft 26.3, on **Fabric** or **NeoForge**. Grab the right
-jar for your loader from [Releases](../../releases).
+Requires Minecraft 26.3, on **Fabric** (with [Fabric API](https://modrinth.com/mod/fabric-api))
+or **NeoForge**. Grab the right jar for your loader from
+[Releases](../../releases).
+
+Install it on the server and on every client that wants to send or see
+pings. Players without the mod can still join a server that has it, and a
+modded client works on a server without it; pings just won't do anything
+there.
 
 ## Keybinds (rebindable)
 
