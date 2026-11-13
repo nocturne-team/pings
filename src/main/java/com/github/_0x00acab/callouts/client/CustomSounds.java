@@ -55,6 +55,19 @@ public final class CustomSounds {
 		}
 	}
 
+	public static void openDirectory() {
+		Path dir = directory();
+		try {
+			Files.createDirectories(dir);
+		} catch (IOException e) {
+			CalloutsMod.LOGGER.warn("Could not create {}", dir, e);
+		}
+		//? if >=26.3 {
+		com.mojang.blaze3d.Blaze3D.openPath(dir);
+		//?} else
+		/*Util.getPlatform().openPath(dir);*/
+	}
+
 	public static String displayName(String fileName) {
 		return fileName.length() > 4 ? fileName.substring(0, fileName.length() - 4) : fileName;
 	}
@@ -109,13 +122,18 @@ public final class CustomSounds {
 
 		// Builds the event in place of a sounds.json lookup, and puts the decoded file where the engine looks for it.
 		@Override
+		//? if >=26.3 {
 		public WeighedSoundEvents getOrResolve(SoundManager manager) {
+		//?} else
+		/*public WeighedSoundEvents resolve(SoundManager manager) {*/
 			sound = new Sound(identifier, ConstantFloat.of(1.0f), ConstantFloat.of(1.0f), 1, Sound.Type.FILE, false, false, 16);
-			soundEvent = new WeighedSoundEvents(identifier, "subtitles.callouts.ping");
-			soundEvent.addSound(sound);
+			WeighedSoundEvents events = new WeighedSoundEvents(identifier, "subtitles.callouts.ping");
+			events.addSound(sound);
+			//? if >=26.3
+			soundEvent = events;
 			Minecraft.getInstance().getSoundManager().soundEngine.soundBuffers.cache
 				.computeIfAbsent(sound.getPath(), key -> CompletableFuture.supplyAsync(() -> decode(file), Util.nonCriticalIoPool()));
-			return soundEvent;
+			return events;
 		}
 	}
 }

@@ -1,6 +1,5 @@
 package com.github._0x00acab.callouts.client;
 
-import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
@@ -34,7 +33,7 @@ public final class SoundPickerScreen extends Screen {
 		LinearLayout footer = layout.addToFooter(LinearLayout.horizontal().spacing(8));
 		footer.addChild(pitch);
 		footer.addChild(Button.builder(Component.translatable("callouts.config.open_sounds_folder"),
-			button -> Blaze3D.openPath(CustomSounds.directory())).width(120).build());
+			button -> CustomSounds.openDirectory()).width(120).build());
 		footer.addChild(Button.builder(CommonComponents.GUI_DONE, button -> onClose()).width(80).build());
 		layout.visitWidgets(this::addRenderableWidget);
 		repositionElements();
