@@ -80,7 +80,12 @@ public final class PingSounds {
 		if (note != null) {
 			NoteBlockInstrument instrument = instrument(note.instrument());
 			instance = instrument == null ? null : new SimpleSoundInstance(
-				instrument.getSoundEvent().value().location(), SoundSource.PLAYERS, (float) volume, note.pitch(), RANDOM,
+				//? if >=1.21 {
+				instrument.getSoundEvent().value().location(),
+				//?} else {
+				/*instrument.getSoundEvent().value().getLocation(),
+				*///?}
+				 SoundSource.PLAYERS, (float) volume, note.pitch(), RANDOM,
 				false, 0, SoundInstance.Attenuation.NONE, x, y, z, relative);
 		} else if (id.startsWith(CustomSounds.PREFIX)) {
 			// A missing or oversized file is skipped silently; the picker only lists files that exist.

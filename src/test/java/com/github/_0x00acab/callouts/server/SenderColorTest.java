@@ -1,7 +1,6 @@
 package com.github._0x00acab.callouts.server;
 
 import java.util.UUID;
-import net.minecraft.util.ARGB;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +12,7 @@ class SenderColorTest {
 
 	@Test
 	void fallbackIsOpaque() {
-		assertEquals(255, ARGB.alpha(SenderColor.fallback(NOTCH)));
+		assertEquals(255, SenderColor.fallback(NOTCH) >>> 24);
 	}
 
 	@Test

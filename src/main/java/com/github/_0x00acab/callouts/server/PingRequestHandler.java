@@ -72,9 +72,18 @@ public final class PingRequestHandler {
 	// Only entities the server already sends to this player can be pinged; otherwise a modified client could
 	// guess entity ids and get back positions of entities outside its tracking range.
 	private static boolean isTrackedBy(ServerPlayer player, Entity entity) {
+		//? if >=1.21 {
 		boolean[] tracked = {false};
 		player.level().getChunkSource().chunkMap.forEachEntityTrackedBy(player, seen -> tracked[0] |= seen == entity);
 		return tracked[0];
+		//?} else {
+		/*// 1.20.1 keeps the tracker private, so repeat its range check: type range capped by view distance.
+		int viewDistance = player.server.getPlayerList().getViewDistance();
+		double range = Math.min(entity.getType().clientTrackingRange(), viewDistance) * 16.0;
+		double dx = player.getX() - entity.getX();
+		double dz = player.getZ() - entity.getZ();
+		return dx * dx + dz * dz <= range * range && entity.broadcastToPlayer(player);
+		*///?}
 	}
 
 	static boolean isValidTarget(Vec3 eye, Vec3 target, double maxDistance) {

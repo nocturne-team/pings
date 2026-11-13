@@ -90,7 +90,7 @@ public final class ClientConfig {
 		try {
 			double value = Double.parseDouble(raw.trim());
 			if (Double.isFinite(value)) {
-				return Math.clamp(value, min, max);
+				return Math.max(min, Math.min(max, value));
 			}
 		} catch (NumberFormatException ignored) {
 		}

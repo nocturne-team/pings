@@ -1,7 +1,11 @@
 package com.github._0x00acab.callouts;
 
 import java.util.List;
+//? if >=1.21 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;
+*///?}
 
 public enum PingCategory {
 	PLAIN("plain"),
@@ -29,12 +33,20 @@ public enum PingCategory {
 	}
 
 	// 26px outlined icon for the wheel.
+	//? if >=1.21 {
 	public Identifier sprite() {
+	//?} else {
+	/*public ResourceLocation sprite() {
+	*///?}
 		return CalloutsMod.id("category/" + key);
 	}
 
 	// 13px plain glyph for the HUD marker, drawn 1:1 so it stays crisp.
+	//? if >=1.21 {
 	public Identifier markerSprite() {
+	//?} else {
+	/*public ResourceLocation markerSprite() {
+	*///?}
 		return CalloutsMod.id("marker/" + key);
 	}
 }

@@ -19,7 +19,7 @@ class PingTrackerTest {
 	void addedPingIsActiveImmediately() {
 		addAt(1);
 		assertEquals(1, tracker.active().size());
-		assertEquals(new Vec3(1, 64, 0), tracker.active().getFirst().position());
+		assertEquals(new Vec3(1, 64, 0), tracker.active().get(0).position());
 	}
 
 	@Test
@@ -38,7 +38,7 @@ class PingTrackerTest {
 		addAt(2);
 		now[0] = 10_000;
 		assertEquals(1, tracker.active().size());
-		assertEquals(2, tracker.active().getFirst().position().x);
+		assertEquals(2, tracker.active().get(0).position().x);
 	}
 
 	@Test
@@ -47,7 +47,7 @@ class PingTrackerTest {
 			addAt(i);
 		}
 		assertEquals(PingTracker.MAX_ACTIVE, tracker.active().size());
-		assertEquals(1, tracker.active().getFirst().position().x);
+		assertEquals(1, tracker.active().get(0).position().x);
 	}
 
 	@Test

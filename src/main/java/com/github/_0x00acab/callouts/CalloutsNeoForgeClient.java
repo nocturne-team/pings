@@ -1,6 +1,6 @@
 package com.github._0x00acab.callouts;
 
-//? if neoforge {
+//? if neoforge && >=1.21 {
 /*import com.github._0x00acab.callouts.client.CalloutsConfigScreen;
 import com.github._0x00acab.callouts.client.PingClient;
 import com.github._0x00acab.callouts.client.PingHud;

@@ -3,7 +3,11 @@ package com.github._0x00acab.callouts;
 import com.github._0x00acab.callouts.server.PingRateLimiter;
 import com.github._0x00acab.callouts.server.PingRequestHandler;
 import com.github._0x00acab.callouts.server.VanillaTeamProvider;
+//? if >=1.21 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;
+*///?}
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +22,15 @@ public final class CalloutsMod {
 
 	private CalloutsMod() {}
 
+	//? if >=1.21 {
 	public static Identifier id(String path) {
 		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
+	//?} else {
+	/*public static ResourceLocation id(String path) {
+		return new ResourceLocation(MOD_ID, path);
+	}
+	*///?}
 
 	public static void init() {
 		config = CalloutsConfig.load(ModLoaderAccess.INSTANCE.getConfigDir().resolve("callouts.properties"));

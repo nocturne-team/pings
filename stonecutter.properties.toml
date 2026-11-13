@@ -30,3 +30,23 @@ deps.modmenu = "20.0.3"
 [neoforge."26.2"]
 mod.mc_compat = "[26.2, 26.3)"
 deps.neo_loader = "26.2.0.93"
+
+["26.1"]
+# Compiled against 26.1.2, which Fabric API and NeoForge for this line target.
+mod.mc_releases = ["26.1", "26.1.1", "26.1.2"]
+
+[fabric."26.1"]
+mod.mc_compat = "~26.1"
+deps.fabric_api = "0.155.3+26.1.2"
+deps.modmenu = "18.0.2"
+
+[neoforge."26.1"]
+mod.mc_compat = "[26.1, 26.2)"
+deps.neo_loader = "26.1.2.126"
+
+["1.20.1"]
+mod.mc_releases = ["1.20.1"]
+
+[neoforge."1.20.1"]
+mod.mc_compat = "[1.20.1, 1.20.2)"
+deps.neo_loader = "1.20.1-47.1.106"

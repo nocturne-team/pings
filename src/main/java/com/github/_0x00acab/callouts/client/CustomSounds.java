@@ -2,7 +2,16 @@ package com.github._0x00acab.callouts.client;
 
 import com.github._0x00acab.callouts.CalloutsMod;
 import com.github._0x00acab.callouts.ModLoaderAccess;
+//? if >=1.21 {
 import com.mojang.blaze3d.audio.SoundBuffer;
+import net.minecraft.client.sounds.JOrbisAudioStream;
+import net.minecraft.resources.Identifier;
+//?} else {
+/*import com.mojang.blaze3d.audio.OggAudioStream;
+import net.minecraft.client.sounds.AudioStream;
+import net.minecraft.client.sounds.SoundBufferLibrary;
+import net.minecraft.resources.ResourceLocation;
+*///?}
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -16,12 +25,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
-import net.minecraft.client.sounds.JOrbisAudioStream;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.sounds.WeighedSoundEvents;
-import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundSource;
+//? if >=1.21 {
 import net.minecraft.util.Util;
+//?} else {
+/*import net.minecraft.Util;
+*///?}
 import net.minecraft.util.valueproviders.ConstantFloat;
 import net.minecraft.util.RandomSource;
 
@@ -64,8 +75,13 @@ public final class CustomSounds {
 		}
 		//? if >=26.3 {
 		com.mojang.blaze3d.Blaze3D.openPath(dir);
-		//?} else
-		/*Util.getPlatform().openPath(dir);*/
+		//?}
+		//? if >=1.21 && <26.3 {
+		/*Util.getPlatform().openPath(dir);
+		*///?}
+		//? if <1.21 {
+		/*Util.getPlatform().openFile(dir.toFile());
+		*///?}
 	}
 
 	public static String displayName(String fileName) {
@@ -93,10 +109,11 @@ public final class CustomSounds {
 			return null;
 		}
 		// The modified time is part of the key, so editing a file is picked up without a resource reload.
-		Identifier id = CalloutsMod.id("custom/" + slug(fileName) + "_" + Long.toHexString(modified));
+		var id = CalloutsMod.id("custom/" + slug(fileName) + "_" + Long.toHexString(modified));
 		return new Instance(id, file, volume, x, y, z, relative);
 	}
 
+	//? if >=1.21 {
 	private static SoundBuffer decode(Path file) {
 		try (InputStream in = Files.newInputStream(file); JOrbisAudioStream stream = new JOrbisAudioStream(in)) {
 			return new SoundBuffer(stream.readAll(), stream.getFormat());
@@ -105,11 +122,16 @@ public final class CustomSounds {
 			throw new CompletionException(e);
 		}
 	}
+	//?}
 
 	private static final class Instance extends AbstractSoundInstance {
 		private final Path file;
 
+		//? if >=1.21 {
 		Instance(Identifier id, Path file, float volume, double x, double y, double z, boolean relative) {
+		//?} else {
+		/*Instance(ResourceLocation id, Path file, float volume, double x, double y, double z, boolean relative) {
+		*///?}
 			super(id, SoundSource.PLAYERS, RandomSource.create());
 			this.file = file;
 			this.volume = volume;
@@ -125,15 +147,38 @@ public final class CustomSounds {
 		//? if >=26.3 {
 		public WeighedSoundEvents getOrResolve(SoundManager manager) {
 		//?} else
-		/*public WeighedSoundEvents resolve(SoundManager manager) {*/
+		//public WeighedSoundEvents resolve(SoundManager manager) {
+			//? if >=1.21 {
 			sound = new Sound(identifier, ConstantFloat.of(1.0f), ConstantFloat.of(1.0f), 1, Sound.Type.FILE, false, false, 16);
 			WeighedSoundEvents events = new WeighedSoundEvents(identifier, "subtitles.callouts.ping");
+			//?} else {
+			/*// Streamed, so the engine asks getStream below for the audio.
+			sound = new Sound(location.toString(), ConstantFloat.of(1.0f), ConstantFloat.of(1.0f), 1, Sound.Type.FILE, true, false, 16);
+			WeighedSoundEvents events = new WeighedSoundEvents(location, "subtitles.callouts.ping");
+			*///?}
 			events.addSound(sound);
 			//? if >=26.3
 			soundEvent = events;
+			//? if >=1.21 {
 			Minecraft.getInstance().getSoundManager().soundEngine.soundBuffers.cache
 				.computeIfAbsent(sound.getPath(), key -> CompletableFuture.supplyAsync(() -> decode(file), Util.nonCriticalIoPool()));
+			//?}
 			return events;
 		}
+
+		//? if <1.21 {
+		/*// Forge hook: read straight from the file instead of the resource manager.
+		@Override
+		public CompletableFuture<AudioStream> getStream(SoundBufferLibrary soundBuffers, Sound sound, boolean looping) {
+			return CompletableFuture.supplyAsync(() -> {
+				try {
+					return new OggAudioStream(Files.newInputStream(file));
+				} catch (IOException e) {
+					CalloutsMod.LOGGER.warn("Could not decode custom ping sound {}", file, e);
+					throw new CompletionException(e);
+				}
+			}, Util.backgroundExecutor());
+		}
+		*///?}
 	}
 }

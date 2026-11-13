@@ -14,8 +14,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 public final class PingClient {
+	//? if >=1.21 {
 	public static final KeyMapping QUICK_PING_KEY = new KeyMapping("key.callouts.quick_ping", InputConstants.KEY_Z, KeyMapping.Category.MULTIPLAYER);
 	public static final KeyMapping WHEEL_KEY = new KeyMapping("key.callouts.ping_wheel", InputConstants.KEY_R, KeyMapping.Category.MULTIPLAYER);
+	//?} else {
+	/*public static final KeyMapping QUICK_PING_KEY = new KeyMapping("key.callouts.quick_ping", InputConstants.KEY_Z, "key.categories.multiplayer");
+	public static final KeyMapping WHEEL_KEY = new KeyMapping("key.callouts.ping_wheel", InputConstants.KEY_R, "key.categories.multiplayer");
+	*///?}
 	public static final PingTracker TRACKER = new PingTracker(() -> System.nanoTime() / 1_000_000L);
 
 	// Returns false when the server can't receive pings (it doesn't have the mod).
@@ -47,8 +52,13 @@ public final class PingClient {
 		}
 		while (WHEEL_KEY.consumeClick()) {
 			// In hold mode, a tap shorter than a tick is already released here and would leave the wheel stuck open.
+			//? if >=26.2 {
 			if (minecraft.gui.screen() == null && (config.wheelToggle || WHEEL_KEY.isDown())) {
 				minecraft.gui.setScreen(new PingWheelScreen(WHEEL_KEY, config.wheelToggle));
+			//?} else {
+			/*if (minecraft.screen == null && (config.wheelToggle || WHEEL_KEY.isDown())) {
+				minecraft.setScreen(new PingWheelScreen(WHEEL_KEY, config.wheelToggle));
+			*///?}
 				// Opening a screen releases every key; re-read held keys so walking continues.
 				KeyMapping.setAll();
 			}
@@ -76,7 +86,11 @@ public final class PingClient {
 	private static void fail(Component message) {
 		Minecraft minecraft = Minecraft.getInstance();
 		if (minecraft.player != null) {
+			//? if >=1.21 {
 			minecraft.player.sendOverlayMessage(message);
+			//?} else {
+			/*minecraft.player.displayClientMessage(message, true);
+			*///?}
 		}
 		PingSounds.error();
 	}

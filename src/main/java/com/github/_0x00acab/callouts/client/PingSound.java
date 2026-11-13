@@ -2,7 +2,11 @@ package com.github._0x00acab.callouts.client;
 
 import com.github._0x00acab.callouts.CalloutsMod;
 import java.util.Locale;
+//? if >=1.21 {
 import net.minecraft.resources.Identifier;
+//?} else {
+/*import net.minecraft.resources.ResourceLocation;
+*///?}
 
 public enum PingSound {
 	NONE,
@@ -25,7 +29,11 @@ public enum PingSound {
 	}
 
 	// Event names match sounds.json, so resource packs can replace any of them.
+	//? if >=1.21 {
 	public Identifier event() {
+	//?} else {
+	/*public ResourceLocation event() {
+	*///?}
 		return CalloutsMod.id("ping." + id());
 	}
 

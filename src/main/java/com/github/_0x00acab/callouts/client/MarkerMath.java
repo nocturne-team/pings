@@ -46,7 +46,7 @@ public final class MarkerMath {
 	}
 
 	public static int withOpacity(int argb, double opacity) {
-		int alpha = (int) Math.round((argb >>> 24) * Math.clamp(opacity, 0.0, 1.0));
+		int alpha = (int) Math.round((argb >>> 24) * Math.max(0.0, Math.min(1.0, opacity)));
 		return (alpha << 24) | (argb & 0x00FFFFFF);
 	}
 
