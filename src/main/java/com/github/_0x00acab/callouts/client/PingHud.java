@@ -99,7 +99,11 @@ public final class PingHud {
 		pose.popMatrix();
 		if (category != PingCategory.PLAIN) {
 			// Tint is white with the marker's alpha, so the icon fades with the diamond.
-			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, category.sprite(), -ICON / 2, -ICON / 2, ICON, ICON, (color & 0xFF000000) | 0x00FFFFFF);
+			// Odd-sized icon on an even-sized diamond: shift by half a pixel so it sits dead center.
+			pose.pushMatrix();
+			pose.translate(-ICON / 2f, -ICON / 2f);
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, category.markerSprite(), 0, 0, ICON, ICON, (color & 0xFF000000) | 0x00FFFFFF);
+			pose.popMatrix();
 		}
 		pose.popMatrix();
 

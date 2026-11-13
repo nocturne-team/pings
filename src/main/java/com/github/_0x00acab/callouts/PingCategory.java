@@ -28,7 +28,13 @@ public enum PingCategory {
 		return "callouts.category." + key;
 	}
 
+	// 26px outlined icon for the wheel.
 	public Identifier sprite() {
 		return CalloutsMod.id("category/" + key);
+	}
+
+	// 13px plain glyph for the HUD marker, drawn 1:1 so it stays crisp.
+	public Identifier markerSprite() {
+		return CalloutsMod.id("marker/" + key);
 	}
 }
