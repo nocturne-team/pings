@@ -8,6 +8,10 @@ base.archivesName = "${property("mod.id") as String}-fabric"
 
 val requiredJava = JavaVersion.VERSION_25
 
+repositories {
+	maven("https://maven.terraformersmc.com/releases/") { name = "TerraformersMC" }
+}
+
 dependencies {
 	fun fapi(vararg modules: String) {
 		for (it in modules) modImplementation(fabricApi.module(it, sc.properties["deps.fabric_api"]))
@@ -25,6 +29,10 @@ dependencies {
 		"fabric-rendering-v1",
 		"fabric-resource-loader-v0",
 	)
+
+	// Optional at runtime: only used to show the config screen in ModMenu's list.
+	modCompileOnly("com.terraformersmc:modmenu:${property("deps.modmenu")}")
+	modLocalRuntime("com.terraformersmc:modmenu:${property("deps.modmenu")}")
 
 	testImplementation(platform("org.junit:junit-bom:5.11.3"))
 	testImplementation("org.junit.jupiter:junit-jupiter")

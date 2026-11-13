@@ -35,14 +35,16 @@ replay_*.log
 result
 result-*
 
-# superpowers scratch, specs and plans — kept locally, not tracked
+# superpowers scratch, specs and plans
 .superpowers/
-docs/superpower*/
 
-# AI assistant config/instructions — never tracked
+# AI assistant config/instructions
 .claude/
 CLAUDE.md
 AGENTS.md
 
 # game logs from dev runs
 logs/
+
+# local documentation
+docs/

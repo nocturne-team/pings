@@ -44,6 +44,20 @@ there.
 | Quick ping | `Z`     |
 | Ping wheel | `R`     |
 
+## Client settings
+
+Open them from ModMenu on Fabric or the mod list on NeoForge. Marker size
+and opacity, distance labels, off-screen arrows, ping sound and volume, and
+hold vs toggle for the wheel. Saved to `config/callouts-client.properties`.
+
+To use your own ping sound, put an `.ogg` file in `config/callouts/sounds/`
+(the picker has an "Open Sounds Folder" button) and pick it from the list.
+Use a mono file if you want to hear which direction the ping came from;
+stereo files play without direction. Max 2 MB.
+
+If a ping doesn't go through, the action bar says why: on cooldown, too many
+pings in a row, out of range, or the server doesn't have the mod.
+
 ## Server config
 
 Written to `config/callouts.properties` on first run:
@@ -65,11 +79,21 @@ Written to `config/callouts.properties` on first run:
 
 ## Roadmap
 
-Not built yet, but planned: sound cues per category, Xaero's
+Not built yet, but planned: Xaero's
 Minimap/Worldmap integration, a wider Minecraft version/loader matrix, and
 soft-dependency `TeamProvider` implementations for FTB Teams and Open
 Parties & Claims.
 
 ## License
 
-[CC0 1.0](LICENSE) — public domain.
+Code and textures: [CC0 1.0](LICENSE), public domain.
+
+The ping sounds in `src/main/resources/assets/callouts/sounds/` are not CC0.
+They come from Pixabay under the
+[Pixabay Content License](https://pixabay.com/service/license-summary/) and
+can't be redistributed on their own:
+
+- `click_soft`, `click_deep`, `click_retro`, `focus`, `swipe_confirm`: by
+  [SoundShelfStudio](https://pixabay.com/users/soundshelfstudio-46480698/)
+- `chime`: by [Arnav Geddada](https://pixabay.com/users/arnav_geddada-51302802/)
+- `tick`: by [u_o8xh7gwsrj](https://pixabay.com/pl/users/u_o8xh7gwsrj-54433977/)

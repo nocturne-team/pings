@@ -41,6 +41,8 @@ public final class PingHud {
 		}
 		Matrix4f worldToClip = worldToClip(minecraft.gameRenderer, state, camera);
 		float partial = deltaTracker.getGameTimeDeltaPartialTick(true);
+		ClientConfig config = PingClient.config();
+		int textColor = MarkerMath.withOpacity(TEXT_COLOR, config.markerOpacity);
 
 		for (ActivePing ping : PingClient.TRACKER.active()) {
 			Vec3 target = ping.renderPosition(liveAnchor(level, ping, partial));
@@ -51,11 +53,13 @@ public final class PingHud {
 				continue;
 			}
 			double distance = relative.length();
-			String label = MarkerMath.formatDistance(distance);
+			String label = config.showDistance ? MarkerMath.formatDistance(distance) : null;
+			int color = MarkerMath.withOpacity(ping.color(), config.markerOpacity);
 			if (placement.onScreen()) {
-				drawDiamond(graphics, minecraft, placement, ping, label, (float) MarkerMath.markerScale(distance));
-			} else {
-				drawArrow(graphics, minecraft, placement, ping.color(), label);
+				float scale = (float) (MarkerMath.markerScale(distance) * config.markerScale);
+				drawDiamond(graphics, minecraft, placement, ping.category(), color, label, textColor, scale);
+			} else if (config.showOffscreenArrows) {
+				drawArrow(graphics, minecraft, placement, color, label, textColor);
 			}
 		}
 	}
@@ -81,7 +85,7 @@ public final class PingHud {
 		return entity.getPosition(partial).add(0, entity.getBbHeight() + PingBroadcastPayload.ENTITY_MARKER_OFFSET, 0);
 	}
 
-	private static void drawDiamond(GuiGraphicsExtractor graphics, Minecraft minecraft, MarkerMath.Placement placement, ActivePing ping, String label, float scale) {
+	private static void drawDiamond(GuiGraphicsExtractor graphics, Minecraft minecraft, MarkerMath.Placement placement, PingCategory category, int color, String label, int textColor, float scale) {
 		Matrix3x2fStack pose = graphics.pose();
 		pose.pushMatrix();
 		pose.translate((float) placement.x(), (float) placement.y());
@@ -90,16 +94,19 @@ public final class PingHud {
 		pose.scale(scale, scale);
 		pose.pushMatrix();
 		pose.rotate((float) (Math.PI / 4));
-		frame(graphics, OUTLINE_HALF, ping.color());
-		graphics.fill(-FILL_HALF, -FILL_HALF, FILL_HALF, FILL_HALF, ping.color());
+		frame(graphics, OUTLINE_HALF, color);
+		graphics.fill(-FILL_HALF, -FILL_HALF, FILL_HALF, FILL_HALF, color);
 		pose.popMatrix();
-		if (ping.category() != PingCategory.PLAIN) {
-			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ping.category().sprite(), -ICON / 2, -ICON / 2, ICON, ICON);
+		if (category != PingCategory.PLAIN) {
+			// Tint is white with the marker's alpha, so the icon fades with the diamond.
+			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, category.sprite(), -ICON / 2, -ICON / 2, ICON, ICON, (color & 0xFF000000) | 0x00FFFFFF);
 		}
 		pose.popMatrix();
 
-		int diamondTop = (int) Math.ceil(OUTLINE_HALF * Math.sqrt(2) * scale);
-		graphics.centeredText(minecraft.font, label, 0, -diamondTop - minecraft.font.lineHeight - 1, TEXT_COLOR);
+		if (label != null) {
+			int diamondTop = (int) Math.ceil(OUTLINE_HALF * Math.sqrt(2) * scale);
+			graphics.centeredText(minecraft.font, label, 0, -diamondTop - minecraft.font.lineHeight - 1, textColor);
+		}
 		pose.popMatrix();
 	}
 
@@ -110,7 +117,7 @@ public final class PingHud {
 		graphics.fill(half - 1, -half + 1, half, half - 1, color);
 	}
 
-	private static void drawArrow(GuiGraphicsExtractor graphics, Minecraft minecraft, MarkerMath.Placement placement, int color, String label) {
+	private static void drawArrow(GuiGraphicsExtractor graphics, Minecraft minecraft, MarkerMath.Placement placement, int color, String label, int textColor) {
 		Matrix3x2fStack pose = graphics.pose();
 		pose.pushMatrix();
 		pose.translate((float) placement.x(), (float) placement.y());
@@ -124,8 +131,10 @@ public final class PingHud {
 		graphics.fill(6, -1, 7, 1, color);
 		pose.popMatrix();
 
-		pose.translate(-(float) Math.cos(placement.arrowAngle()) * 20, -(float) Math.sin(placement.arrowAngle()) * 14);
-		graphics.centeredText(minecraft.font, label, 0, -minecraft.font.lineHeight / 2, TEXT_COLOR);
+		if (label != null) {
+			pose.translate(-(float) Math.cos(placement.arrowAngle()) * 20, -(float) Math.sin(placement.arrowAngle()) * 14);
+			graphics.centeredText(minecraft.font, label, 0, -minecraft.font.lineHeight / 2, textColor);
+		}
 		pose.popMatrix();
 	}
 }

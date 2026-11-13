@@ -17,9 +17,11 @@ public class CalloutsFabricClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		PingClient.init(request -> {
-			if (ClientPlayNetworking.canSend(PingRequestPayload.TYPE)) {
-				ClientPlayNetworking.send(request);
+			if (!ClientPlayNetworking.canSend(PingRequestPayload.TYPE)) {
+				return false;
 			}
+			ClientPlayNetworking.send(request);
+			return true;
 		});
 		KeyMappingHelper.registerKeyMapping(PingClient.QUICK_PING_KEY);
 		KeyMappingHelper.registerKeyMapping(PingClient.WHEEL_KEY);

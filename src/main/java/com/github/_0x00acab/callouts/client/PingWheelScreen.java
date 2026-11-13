@@ -17,12 +17,15 @@ public final class PingWheelScreen extends GameModeSwitcherScreen {
 	private static final int TILE_HALF = 16;
 	private static final int ICON = 26;
 
-	private final KeyMapping holdKey;
+	private final KeyMapping wheelKey;
+	// Toggle: a second press of the wheel key picks. Hold: releasing it picks.
+	private final boolean toggle;
 	private double lastMouseX;
 	private double lastMouseY;
 
-	public PingWheelScreen(KeyMapping holdKey) {
-		this.holdKey = holdKey;
+	public PingWheelScreen(KeyMapping wheelKey, boolean toggle) {
+		this.wheelKey = wheelKey;
+		this.toggle = toggle;
 	}
 
 	@Override
@@ -65,12 +68,16 @@ public final class PingWheelScreen extends GameModeSwitcherScreen {
 			onClose();
 			return true;
 		}
+		if (toggle && wheelKey.matches(event)) {
+			commit(lastMouseX, lastMouseY);
+			return true;
+		}
 		return false;
 	}
 
 	@Override
 	public boolean keyReleased(KeyEvent event) {
-		if (holdKey.matches(event)) {
+		if (!toggle && wheelKey.matches(event)) {
 			commit(lastMouseX, lastMouseY);
 			return true;
 		}
@@ -79,7 +86,7 @@ public final class PingWheelScreen extends GameModeSwitcherScreen {
 
 	@Override
 	public boolean mouseReleased(MouseButtonEvent event) {
-		if (holdKey.matchesMouse(event)) {
+		if (!toggle && wheelKey.matchesMouse(event)) {
 			commit(event.x(), event.y());
 			return true;
 		}
@@ -88,7 +95,7 @@ public final class PingWheelScreen extends GameModeSwitcherScreen {
 
 	@Override
 	public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-		if (event.button() == 0) {
+		if (event.button() == 0 || (toggle && wheelKey.matchesMouse(event))) {
 			commit(event.x(), event.y());
 			return true;
 		}

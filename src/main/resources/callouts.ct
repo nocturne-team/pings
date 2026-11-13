@@ -1,3 +1,6 @@
 classTweaker v2 official
 accessible method net/minecraft/client/renderer/GameRenderer bobHurt (Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V
 accessible method net/minecraft/client/renderer/GameRenderer bobView (Lnet/minecraft/client/renderer/state/level/CameraRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;)V
+accessible field net/minecraft/client/sounds/SoundManager soundEngine Lnet/minecraft/client/sounds/SoundEngine;
+accessible field net/minecraft/client/sounds/SoundEngine soundBuffers Lnet/minecraft/client/sounds/SoundBufferLibrary;
+accessible field net/minecraft/client/sounds/SoundBufferLibrary cache Ljava/util/Map;

@@ -6,6 +6,8 @@ import com.github._0x00acab.callouts.CalloutsConfig;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
 import java.util.List;
+import java.util.Locale;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -28,20 +30,35 @@ public final class PingRequestHandler {
 		}
 
 		Vec3 target = request.position();
+		// Range is checked against what was aimed at, not the marker drawn above an entity's head.
+		Vec3 aimed = target;
 		int entityId = PingRequestPayload.NO_ENTITY;
 		if (request.entityId() != PingRequestPayload.NO_ENTITY) {
 			Entity entity = sender.level().getEntity(request.entityId());
 			if (entity != null && !entity.isRemoved() && !entity.isInvisibleTo(sender) && isTrackedBy(sender, entity)) {
-				target = entity.position().add(0, entity.getBbHeight() + PingBroadcastPayload.ENTITY_MARKER_OFFSET, 0);
+				aimed = entity.position();
+				target = aimed.add(0, entity.getBbHeight() + PingBroadcastPayload.ENTITY_MARKER_OFFSET, 0);
 				entityId = entity.getId();
 			}
 		}
 
-		if (!isValidTarget(sender.getEyePosition(), target, config.maxPingDistance())) {
+		if (!isValidTarget(sender.getEyePosition(), aimed, config.maxPingDistance())) {
+			sender.sendOverlayMessage(Component.translatable("callouts.feedback.too_far", Math.round(config.maxPingDistance())));
 			return;
 		}
-		if (limiter.tryPing(sender.getUUID()) != PingRateLimiter.Result.ACCEPTED) {
-			return;
+		switch (limiter.tryPing(sender.getUUID())) {
+			case COOLDOWN -> {
+				sender.sendOverlayMessage(Component.translatable("callouts.feedback.cooldown"));
+				return;
+			}
+			case LOCKED_OUT -> {
+				// Every attempt while locked out restarts the quiet timer, so say how long to stop for.
+				sender.sendOverlayMessage(Component.translatable("callouts.feedback.locked_out",
+					String.format(Locale.ROOT, "%.1f", config.lockoutQuietMillis() / 1000.0)));
+				return;
+			}
+			case ACCEPTED -> {
+			}
 		}
 
 		PingBroadcastPayload broadcast = new PingBroadcastPayload(target, entityId, category.ordinal(), SenderColor.of(sender));
