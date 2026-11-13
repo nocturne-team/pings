@@ -1,5 +1,6 @@
 plugins {
 	id("dev.kikugie.loom-back-compat")
+	id("com.modrinth.minotaur") version "2.10.0"
 }
 
 // DO NOT set group = ...!
@@ -88,5 +89,30 @@ tasks {
 		val name = project.property("mod.id")
 		inputs.property("mod_id", name)
 		from("../../LICENSE") { rename { "$it-$name" } }
+	}
+}
+
+// Publishing: `./gradlew modrinth` uploads every loader/version jar. Needs MODRINTH_TOKEN; CHANGELOG is optional.
+modrinth {
+	val modVersion = property("mod.version") as String
+	token = providers.environmentVariable("MODRINTH_TOKEN")
+	projectId = "callouts"
+	// MODRINTH_DEBUG=true prints what would be uploaded instead of uploading.
+	debugMode = providers.environmentVariable("MODRINTH_DEBUG").map { it == "true" }.orElse(false)
+	versionNumber = "$modVersion+${sc.current.version}-fabric"
+	versionName = "Callouts $modVersion (Fabric ${sc.current.version})"
+	versionType = when {
+		"alpha" in modVersion -> "alpha"
+		"beta" in modVersion || "rc" in modVersion -> "beta"
+		else -> "release"
+	}
+	changelog = providers.environmentVariable("CHANGELOG").orElse("")
+	uploadFile.set(tasks.named(if (tasks.names.contains("remapJar")) "remapJar" else "jar"))
+	// Stonecutter flattens TOML lists into mod.mc_releases.0, .1, ...
+	gameVersions.addAll(generateSequence(0) { it + 1 }.map { findProperty("mod.mc_releases.$it") as String? }.takeWhile { it != null }.filterNotNull().toList())
+	loaders.add("fabric")
+	dependencies {
+		required.project("fabric-api")
+		optional.project("modmenu")
 	}
 }
