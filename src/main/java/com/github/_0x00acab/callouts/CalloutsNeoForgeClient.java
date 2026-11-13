@@ -6,6 +6,7 @@ import com.github._0x00acab.callouts.client.PingClient;
 import com.github._0x00acab.callouts.client.PingHud;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
 import com.github._0x00acab.callouts.network.PingConfigSyncPayload;
+import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
 import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
@@ -40,6 +41,7 @@ public class CalloutsNeoForgeClient {
 		modEventBus.addListener((RegisterClientPayloadHandlersEvent event) -> {
 			event.register(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
 			event.register(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
+			event.register(PingRejectedPayload.TYPE, (payload, context) -> PingClient.receiveRejection(payload));
 		});
 		modEventBus.addListener((RegisterGuiLayersEvent event) ->
 			event.registerBelow(VanillaGuiLayers.CROSSHAIR, CalloutsMod.id("markers"), PingHud::render));

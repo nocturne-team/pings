@@ -46,6 +46,7 @@ class PayloadCodecTest {
 		assertEquals("callouts:ping_request", PingRequestPayload.TYPE.id().toString());
 		assertEquals("callouts:ping_broadcast", PingBroadcastPayload.TYPE.id().toString());
 		assertEquals("callouts:config_sync", PingConfigSyncPayload.TYPE.id().toString());
+		assertEquals("callouts:ping_rejected", PingRejectedPayload.TYPE.id().toString());
 	}
 
 	@Test
@@ -56,6 +57,17 @@ class PayloadCodecTest {
 		PingConfigSyncPayload.STREAM_CODEC.encode(buf, original);
 
 		assertEquals(original, PingConfigSyncPayload.STREAM_CODEC.decode(buf));
+		assertEquals(0, buf.readableBytes());
+	}
+
+	@Test
+	void rejectionRoundTrips() {
+		PingRejectedPayload original = new PingRejectedPayload(PingRejectedPayload.LOCKED_OUT, 5.0);
+		ByteBuf buf = Unpooled.buffer();
+
+		PingRejectedPayload.STREAM_CODEC.encode(buf, original);
+
+		assertEquals(original, PingRejectedPayload.STREAM_CODEC.decode(buf));
 		assertEquals(0, buf.readableBytes());
 	}
 }

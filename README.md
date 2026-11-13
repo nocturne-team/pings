@@ -55,7 +55,11 @@ To use your own ping sound, put an `.ogg` file in `config/callouts/sounds/`
 Use a mono file if you want to hear which direction the ping came from;
 stereo files play without direction. Max 2 MB.
 
-If a ping doesn't go through, the action bar says why: on cooldown, too many
+Any pitched note block instrument works too, with a pitch slider in the
+picker.
+
+If a ping doesn't go through, a low bass note plays (can be turned off) and
+the action bar says why: on cooldown, too many
 pings in a row, out of range, or the server doesn't have the mod.
 
 ## Server config

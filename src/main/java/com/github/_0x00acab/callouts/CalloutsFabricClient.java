@@ -5,6 +5,7 @@ import com.github._0x00acab.callouts.client.PingClient;
 import com.github._0x00acab.callouts.client.PingHud;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
 import com.github._0x00acab.callouts.network.PingConfigSyncPayload;
+import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -28,6 +29,7 @@ public class CalloutsFabricClient implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(PingClient::tick);
 		ClientPlayNetworking.registerGlobalReceiver(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
 		ClientPlayNetworking.registerGlobalReceiver(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
+		ClientPlayNetworking.registerGlobalReceiver(PingRejectedPayload.TYPE, (payload, context) -> PingClient.receiveRejection(payload));
 		HudElementRegistry.attachElementBefore(VanillaHudElements.CROSSHAIR, CalloutsMod.id("markers"), PingHud::render);
 	}
 }

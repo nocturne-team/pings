@@ -18,9 +18,10 @@ public final class ClientConfig {
 	public double markerOpacity = 1.0;
 	public boolean showDistance = true;
 	public boolean showOffscreenArrows = true;
-	// A built-in PingSound id, or CustomSounds.PREFIX + a file name in config/callouts/sounds.
+	// A built-in PingSound id, a NoteSound id, or CustomSounds.PREFIX + a file name in config/callouts/sounds.
 	public String sound = PingSound.DEFAULT.id();
 	public double soundVolume = 1.0;
+	public boolean errorSound = true;
 	public boolean wheelToggle = false;
 
 	private Path file;
@@ -45,10 +46,11 @@ public final class ClientConfig {
 		config.showOffscreenArrows = readBoolean(props, "show_offscreen_arrows", config.showOffscreenArrows);
 		config.soundVolume = readDouble(props, "sound_volume", config.soundVolume, 0.0, 1.0);
 		config.wheelToggle = readBoolean(props, "wheel_toggle", config.wheelToggle);
+		config.errorSound = readBoolean(props, "error_sound", config.errorSound);
 		String soundId = props.getProperty("sound");
 		if (soundId != null) {
 			soundId = soundId.trim();
-			if (soundId.startsWith(CustomSounds.PREFIX) || PingSound.byId(soundId) != null) {
+			if (soundId.startsWith(CustomSounds.PREFIX) || NoteSound.parse(soundId) != null || PingSound.byId(soundId) != null) {
 				config.sound = soundId;
 			} else {
 				CalloutsMod.LOGGER.warn("Ignoring unknown sound={} in callouts client config", soundId);
@@ -69,6 +71,7 @@ public final class ClientConfig {
 		props.setProperty("sound", sound);
 		props.setProperty("sound_volume", Double.toString(soundVolume));
 		props.setProperty("wheel_toggle", Boolean.toString(wheelToggle));
+		props.setProperty("error_sound", Boolean.toString(errorSound));
 		try {
 			Files.createDirectories(file.getParent());
 			try (Writer writer = Files.newBufferedWriter(file)) {

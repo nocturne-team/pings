@@ -3,6 +3,7 @@ package com.github._0x00acab.callouts;
 //? if neoforge {
 /*import com.github._0x00acab.callouts.network.PingBroadcastPayload;
 import com.github._0x00acab.callouts.network.PingConfigSyncPayload;
+import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
@@ -29,6 +30,7 @@ public class CalloutsNeoForge {
 			(payload, context) -> CalloutsMod.requestHandler().handle((ServerPlayer) context.player(), payload));
 		registrar.playToClient(PingBroadcastPayload.TYPE, PingBroadcastPayload.STREAM_CODEC);
 		registrar.playToClient(PingConfigSyncPayload.TYPE, PingConfigSyncPayload.STREAM_CODEC);
+		registrar.playToClient(PingRejectedPayload.TYPE, PingRejectedPayload.STREAM_CODEC);
 	}
 }
 *///?}

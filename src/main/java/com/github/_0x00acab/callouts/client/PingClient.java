@@ -4,8 +4,10 @@ import com.github._0x00acab.callouts.ModLoaderAccess;
 import com.github._0x00acab.callouts.PingCategory;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
 import com.github._0x00acab.callouts.network.PingConfigSyncPayload;
+import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
 import com.mojang.blaze3d.platform.InputConstants;
+import java.util.Locale;
 import java.util.function.Predicate;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -56,10 +58,27 @@ public final class PingClient {
 	public static void sendPing(Minecraft minecraft, PingCategory category) {
 		PingRequestPayload request = PingTargeting.target(minecraft, category);
 		if (request == null) {
-			minecraft.player.sendOverlayMessage(Component.translatable("callouts.feedback.nothing_to_ping", Math.round(PingTargeting.maxDistance())));
+			fail(Component.translatable("callouts.feedback.nothing_to_ping", Math.round(PingTargeting.maxDistance())));
 		} else if (!sender.test(request)) {
-			minecraft.player.sendOverlayMessage(Component.translatable("callouts.feedback.server_missing_mod"));
+			fail(Component.translatable("callouts.feedback.server_missing_mod"));
 		}
+	}
+
+	public static void receiveRejection(PingRejectedPayload payload) {
+		fail(switch (payload.reason()) {
+			case PingRejectedPayload.COOLDOWN -> Component.translatable("callouts.feedback.cooldown");
+			case PingRejectedPayload.LOCKED_OUT -> Component.translatable("callouts.feedback.locked_out", String.format(Locale.ROOT, "%.1f", payload.value()));
+			case PingRejectedPayload.TOO_FAR -> Component.translatable("callouts.feedback.too_far", Math.round(payload.value()));
+			default -> Component.translatable("callouts.feedback.rejected");
+		});
+	}
+
+	private static void fail(Component message) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player != null) {
+			minecraft.player.sendOverlayMessage(message);
+		}
+		PingSounds.error();
 	}
 
 	public static void receiveConfig(PingConfigSyncPayload payload) {

@@ -34,6 +34,12 @@ public final class CalloutsConfigScreen extends OptionsSubScreen {
 			button -> minecraft.gui.setScreen(new SoundPickerScreen(this))).build();
 		list.addSmall(soundButton,
 			slider("callouts.config.sound_volume", 0.0, 1.0, config.soundVolume, value -> config.soundVolume = value).createButton(options));
+		list.addSmall(OptionInstance.createBoolean("callouts.config.error_sound", config.errorSound, value -> {
+			config.errorSound = value;
+			if (value) {
+				PingSounds.error();
+			}
+		}));
 
 		list.addHeader(Component.translatable("callouts.config.controls"));
 		list.addSmall(

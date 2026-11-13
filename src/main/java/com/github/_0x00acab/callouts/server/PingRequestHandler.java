@@ -4,10 +4,9 @@ import com.github._0x00acab.callouts.ModLoaderAccess;
 import com.github._0x00acab.callouts.PingCategory;
 import com.github._0x00acab.callouts.CalloutsConfig;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
+import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
 import java.util.List;
-import java.util.Locale;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -43,18 +42,17 @@ public final class PingRequestHandler {
 		}
 
 		if (!isValidTarget(sender.getEyePosition(), aimed, config.maxPingDistance())) {
-			sender.sendOverlayMessage(Component.translatable("callouts.feedback.too_far", Math.round(config.maxPingDistance())));
+			reject(sender, PingRejectedPayload.TOO_FAR, config.maxPingDistance());
 			return;
 		}
 		switch (limiter.tryPing(sender.getUUID())) {
 			case COOLDOWN -> {
-				sender.sendOverlayMessage(Component.translatable("callouts.feedback.cooldown"));
+				reject(sender, PingRejectedPayload.COOLDOWN, 0);
 				return;
 			}
 			case LOCKED_OUT -> {
 				// Every attempt while locked out restarts the quiet timer, so say how long to stop for.
-				sender.sendOverlayMessage(Component.translatable("callouts.feedback.locked_out",
-					String.format(Locale.ROOT, "%.1f", config.lockoutQuietMillis() / 1000.0)));
+				reject(sender, PingRejectedPayload.LOCKED_OUT, config.lockoutQuietMillis() / 1000.0);
 				return;
 			}
 			case ACCEPTED -> {
@@ -65,6 +63,10 @@ public final class PingRequestHandler {
 		for (ServerPlayer recipient : recipients(sender)) {
 			ModLoaderAccess.INSTANCE.sendToPlayer(recipient, broadcast);
 		}
+	}
+
+	private static void reject(ServerPlayer sender, int reason, double value) {
+		ModLoaderAccess.INSTANCE.sendToPlayer(sender, new PingRejectedPayload(reason, value));
 	}
 
 	// Only entities the server already sends to this player can be pinged; otherwise a modified client could
