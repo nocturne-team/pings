@@ -28,7 +28,7 @@ public final class PingTracker {
 
 	public void add(Vec3 position, int entityId, PingCategory category, int color) {
 		if (pings.size() >= MAX_ACTIVE) {
-			pings.removeFirst();
+			pings.remove(0);
 		}
 		pings.add(new ActivePing(position, entityId, category, color, clock.getAsLong() + LIFETIME_MILLIS));
 	}

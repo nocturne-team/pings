@@ -97,4 +97,11 @@ class MarkerMathTest {
 		assertEquals("42m", MarkerMath.formatDistance(42.4));
 		assertEquals("256m", MarkerMath.formatDistance(255.6));
 	}
+
+	@Test
+	void opacityScalesAlphaAndKeepsRgb() {
+		assertEquals(0xFF123456, MarkerMath.withOpacity(0xFF123456, 1.0));
+		assertEquals(0x80123456, MarkerMath.withOpacity(0xFF123456, 0.5));
+		assertEquals(0x00123456, MarkerMath.withOpacity(0xFF123456, 0.0));
+	}
 }

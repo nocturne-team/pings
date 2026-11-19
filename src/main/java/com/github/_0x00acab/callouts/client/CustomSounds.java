@@ -1,0 +1,184 @@
+package com.github._0x00acab.callouts.client;
+
+import com.github._0x00acab.callouts.CalloutsMod;
+import com.github._0x00acab.callouts.ModLoaderAccess;
+//? if >=1.21 {
+import com.mojang.blaze3d.audio.SoundBuffer;
+import net.minecraft.client.sounds.JOrbisAudioStream;
+import net.minecraft.resources.Identifier;
+//?} else {
+/*import com.mojang.blaze3d.audio.OggAudioStream;
+import net.minecraft.client.sounds.AudioStream;
+import net.minecraft.client.sounds.SoundBufferLibrary;
+import net.minecraft.resources.ResourceLocation;
+*///?}
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.stream.Stream;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.sounds.AbstractSoundInstance;
+import net.minecraft.client.resources.sounds.Sound;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.sounds.WeighedSoundEvents;
+import net.minecraft.sounds.SoundSource;
+//? if >=1.21 {
+import net.minecraft.util.Util;
+//?} else {
+/*import net.minecraft.Util;
+*///?}
+import net.minecraft.util.valueproviders.ConstantFloat;
+import net.minecraft.util.RandomSource;
+
+// Player-supplied .ogg files from config/callouts/sounds, played without a resource pack.
+public final class CustomSounds {
+	public static final String PREFIX = "file:";
+	private static final long MAX_BYTES = 2L * 1024 * 1024;
+
+	private CustomSounds() {}
+
+	public static Path directory() {
+		return ModLoaderAccess.INSTANCE.getConfigDir().resolve("callouts").resolve("sounds");
+	}
+
+	// File names (with extension) of every usable .ogg, sorted. Creates the folder so "open folder" has something to open.
+	public static List<String> list() {
+		Path dir = directory();
+		try {
+			Files.createDirectories(dir);
+			try (Stream<Path> files = Files.list(dir)) {
+				return files
+					.filter(Files::isRegularFile)
+					.map(path -> path.getFileName().toString())
+					.filter(name -> name.toLowerCase(Locale.ROOT).endsWith(".ogg"))
+					.sorted(String.CASE_INSENSITIVE_ORDER)
+					.toList();
+			}
+		} catch (IOException e) {
+			CalloutsMod.LOGGER.warn("Could not list custom sounds in {}", dir, e);
+			return List.of();
+		}
+	}
+
+	public static void openDirectory() {
+		Path dir = directory();
+		try {
+			Files.createDirectories(dir);
+		} catch (IOException e) {
+			CalloutsMod.LOGGER.warn("Could not create {}", dir, e);
+		}
+		//? if >=26.3 {
+		com.mojang.blaze3d.Blaze3D.openPath(dir);
+		//?}
+		//? if >=1.21 && <26.3 {
+		/*Util.getPlatform().openPath(dir);
+		*///?}
+		//? if <1.21 {
+		/*Util.getPlatform().openFile(dir.toFile());
+		*///?}
+	}
+
+	public static String displayName(String fileName) {
+		return fileName.length() > 4 ? fileName.substring(0, fileName.length() - 4) : fileName;
+	}
+
+	// Identifier paths only allow [a-z0-9/._-].
+	static String slug(String fileName) {
+		return displayName(fileName).toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9_.-]", "_");
+	}
+
+	public static SoundInstance instance(String fileName, float volume, double x, double y, double z, boolean relative) {
+		Path dir = directory();
+		Path file = dir.resolve(fileName).normalize();
+		if (!dir.equals(file.getParent())) {
+			return null;
+		}
+		long modified;
+		try {
+			if (!Files.isRegularFile(file) || Files.size(file) > MAX_BYTES) {
+				return null;
+			}
+			modified = Files.getLastModifiedTime(file).toMillis();
+		} catch (IOException e) {
+			return null;
+		}
+		// The modified time is part of the key, so editing a file is picked up without a resource reload.
+		var id = CalloutsMod.id("custom/" + slug(fileName) + "_" + Long.toHexString(modified));
+		return new Instance(id, file, volume, x, y, z, relative);
+	}
+
+	//? if >=1.21 {
+	private static SoundBuffer decode(Path file) {
+		try (InputStream in = Files.newInputStream(file); JOrbisAudioStream stream = new JOrbisAudioStream(in)) {
+			return new SoundBuffer(stream.readAll(), stream.getFormat());
+		} catch (IOException e) {
+			CalloutsMod.LOGGER.warn("Could not decode custom ping sound {}", file, e);
+			throw new CompletionException(e);
+		}
+	}
+	//?}
+
+	private static final class Instance extends AbstractSoundInstance {
+		private final Path file;
+
+		//? if >=1.21 {
+		Instance(Identifier id, Path file, float volume, double x, double y, double z, boolean relative) {
+		//?} else {
+		/*Instance(ResourceLocation id, Path file, float volume, double x, double y, double z, boolean relative) {
+		*///?}
+			super(id, SoundSource.PLAYERS, RandomSource.create());
+			this.file = file;
+			this.volume = volume;
+			this.x = x;
+			this.y = y;
+			this.z = z;
+			this.relative = relative;
+			this.attenuation = SoundInstance.Attenuation.NONE;
+		}
+
+		// Builds the event in place of a sounds.json lookup, and puts the decoded file where the engine looks for it.
+		@Override
+		//? if >=26.3 {
+		public WeighedSoundEvents getOrResolve(SoundManager manager) {
+		//?} else
+		//public WeighedSoundEvents resolve(SoundManager manager) {
+			//? if >=1.21 {
+			sound = new Sound(identifier, ConstantFloat.of(1.0f), ConstantFloat.of(1.0f), 1, Sound.Type.FILE, false, false, 16);
+			WeighedSoundEvents events = new WeighedSoundEvents(identifier, "subtitles.callouts.ping");
+			//?} else {
+			/*// Streamed, so the engine asks getStream below for the audio.
+			sound = new Sound(location.toString(), ConstantFloat.of(1.0f), ConstantFloat.of(1.0f), 1, Sound.Type.FILE, true, false, 16);
+			WeighedSoundEvents events = new WeighedSoundEvents(location, "subtitles.callouts.ping");
+			*///?}
+			events.addSound(sound);
+			//? if >=26.3
+			soundEvent = events;
+			//? if >=1.21 {
+			Minecraft.getInstance().getSoundManager().soundEngine.soundBuffers.cache
+				.computeIfAbsent(sound.getPath(), key -> CompletableFuture.supplyAsync(() -> decode(file), Util.nonCriticalIoPool()));
+			//?}
+			return events;
+		}
+
+		//? if <1.21 {
+		/*// Forge hook: read straight from the file instead of the resource manager.
+		@Override
+		public CompletableFuture<AudioStream> getStream(SoundBufferLibrary soundBuffers, Sound sound, boolean looping) {
+			return CompletableFuture.supplyAsync(() -> {
+				try {
+					return new OggAudioStream(Files.newInputStream(file));
+				} catch (IOException e) {
+					CalloutsMod.LOGGER.warn("Could not decode custom ping sound {}", file, e);
+					throw new CompletionException(e);
+				}
+			}, Util.backgroundExecutor());
+		}
+		*///?}
+	}
+}

@@ -4,7 +4,9 @@ import com.github._0x00acab.callouts.ModLoaderAccess;
 import com.github._0x00acab.callouts.PingCategory;
 import com.github._0x00acab.callouts.CalloutsConfig;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
+import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -14,11 +16,13 @@ public final class PingRequestHandler {
 	private final CalloutsConfig config;
 	private final PingRateLimiter limiter;
 	private final TeamProvider teams;
+	private final VanillaPings vanillaPings;
 
-	public PingRequestHandler(CalloutsConfig config, PingRateLimiter limiter, TeamProvider teams) {
+	public PingRequestHandler(CalloutsConfig config, PingRateLimiter limiter, TeamProvider teams, VanillaPings vanillaPings) {
 		this.config = config;
 		this.limiter = limiter;
 		this.teams = teams;
+		this.vanillaPings = vanillaPings;
 	}
 
 	public void handle(ServerPlayer sender, PingRequestPayload request) {
@@ -28,34 +32,72 @@ public final class PingRequestHandler {
 		}
 
 		Vec3 target = request.position();
+		// Range is checked against what was aimed at, not the marker drawn above an entity's head.
+		Vec3 aimed = target;
 		int entityId = PingRequestPayload.NO_ENTITY;
+		Entity pinged = null;
 		if (request.entityId() != PingRequestPayload.NO_ENTITY) {
 			Entity entity = sender.level().getEntity(request.entityId());
 			if (entity != null && !entity.isRemoved() && !entity.isInvisibleTo(sender) && isTrackedBy(sender, entity)) {
-				target = entity.position().add(0, entity.getBbHeight() + PingBroadcastPayload.ENTITY_MARKER_OFFSET, 0);
+				aimed = entity.position();
+				target = aimed.add(0, entity.getBbHeight() + PingBroadcastPayload.ENTITY_MARKER_OFFSET, 0);
 				entityId = entity.getId();
+				pinged = entity;
 			}
 		}
 
-		if (!isValidTarget(sender.getEyePosition(), target, config.maxPingDistance())) {
+		if (!isValidTarget(sender.getEyePosition(), aimed, config.maxPingDistance())) {
+			reject(sender, PingRejectedPayload.TOO_FAR, config.maxPingDistance());
 			return;
 		}
-		if (limiter.tryPing(sender.getUUID()) != PingRateLimiter.Result.ACCEPTED) {
-			return;
+		switch (limiter.tryPing(sender.getUUID())) {
+			case COOLDOWN -> {
+				reject(sender, PingRejectedPayload.COOLDOWN, 0);
+				return;
+			}
+			case LOCKED_OUT -> {
+				// Every attempt while locked out restarts the quiet timer, so say how long to stop for.
+				reject(sender, PingRejectedPayload.LOCKED_OUT, config.lockoutQuietMillis() / 1000.0);
+				return;
+			}
+			case ACCEPTED -> {
+			}
 		}
 
-		PingBroadcastPayload broadcast = new PingBroadcastPayload(target, entityId, category.ordinal(), SenderColor.of(sender));
+		int color = SenderColor.of(sender);
+		PingBroadcastPayload broadcast = new PingBroadcastPayload(target, entityId, category.ordinal(), color);
+		List<ServerPlayer> vanilla = new ArrayList<>();
 		for (ServerPlayer recipient : recipients(sender)) {
-			ModLoaderAccess.INSTANCE.sendToPlayer(recipient, broadcast);
+			if (ModLoaderAccess.INSTANCE.hasCallouts(recipient)) {
+				ModLoaderAccess.INSTANCE.sendToPlayer(recipient, broadcast);
+			} else {
+				vanilla.add(recipient);
+			}
 		}
+		if (config.vanillaFallback() && !vanilla.isEmpty()) {
+			vanillaPings.show(sender, vanilla, target, pinged, category, color);
+		}
+	}
+
+	private static void reject(ServerPlayer sender, int reason, double value) {
+		ModLoaderAccess.INSTANCE.sendToPlayer(sender, new PingRejectedPayload(reason, value));
 	}
 
 	// Only entities the server already sends to this player can be pinged; otherwise a modified client could
 	// guess entity ids and get back positions of entities outside its tracking range.
 	private static boolean isTrackedBy(ServerPlayer player, Entity entity) {
+		//? if >=1.21 {
 		boolean[] tracked = {false};
 		player.level().getChunkSource().chunkMap.forEachEntityTrackedBy(player, seen -> tracked[0] |= seen == entity);
 		return tracked[0];
+		//?} else {
+		/*// 1.20.1 keeps the tracker private, so repeat its range check: type range capped by view distance.
+		int viewDistance = player.server.getPlayerList().getViewDistance();
+		double range = Math.min(entity.getType().clientTrackingRange(), viewDistance) * 16.0;
+		double dx = player.getX() - entity.getX();
+		double dz = player.getZ() - entity.getZ();
+		return dx * dx + dz * dz <= range * range && entity.broadcastToPlayer(player);
+		*///?}
 	}
 
 	static boolean isValidTarget(Vec3 eye, Vec3 target, double maxDistance) {

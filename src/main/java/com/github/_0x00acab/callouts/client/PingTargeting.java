@@ -35,7 +35,11 @@ public final class PingTargeting {
 		if (camera == null || minecraft.level == null) {
 			return null;
 		}
+		//? if >=1.21 {
 		float partial = minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(true);
+		//?} else {
+		/*float partial = minecraft.getFrameTime();
+		*///?}
 		HitResult blockHit = camera.pick(maxDistance, partial, false);
 		Vec3 eye = camera.getEyePosition(partial);
 		Vec3 look = camera.getViewVector(partial);

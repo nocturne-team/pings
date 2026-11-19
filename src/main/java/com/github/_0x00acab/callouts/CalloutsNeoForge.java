@@ -1,8 +1,9 @@
 package com.github._0x00acab.callouts;
 
-//? if neoforge {
+//? if neoforge && >=1.21 {
 /*import com.github._0x00acab.callouts.network.PingBroadcastPayload;
 import com.github._0x00acab.callouts.network.PingConfigSyncPayload;
+import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
@@ -10,6 +11,8 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
@@ -21,6 +24,8 @@ public class CalloutsNeoForge {
 		NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) ->
 			ModLoaderAccess.INSTANCE.sendToPlayer((ServerPlayer) event.getEntity(),
 				new PingConfigSyncPayload(CalloutsMod.config().maxPingDistance())));
+		NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event) -> CalloutsMod.vanillaPings().tick());
+		NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> CalloutsMod.vanillaPings().clear());
 	}
 
 	private static void registerPayloads(RegisterPayloadHandlersEvent event) {
@@ -29,6 +34,7 @@ public class CalloutsNeoForge {
 			(payload, context) -> CalloutsMod.requestHandler().handle((ServerPlayer) context.player(), payload));
 		registrar.playToClient(PingBroadcastPayload.TYPE, PingBroadcastPayload.STREAM_CODEC);
 		registrar.playToClient(PingConfigSyncPayload.TYPE, PingConfigSyncPayload.STREAM_CODEC);
+		registrar.playToClient(PingRejectedPayload.TYPE, PingRejectedPayload.STREAM_CODEC);
 	}
 }
 *///?}

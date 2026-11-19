@@ -1,25 +1,41 @@
 package com.github._0x00acab.callouts.client;
 
+import com.github._0x00acab.callouts.ModLoaderAccess;
 import com.github._0x00acab.callouts.PingCategory;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
 import com.github._0x00acab.callouts.network.PingConfigSyncPayload;
+import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
 import com.mojang.blaze3d.platform.InputConstants;
-import java.util.function.Consumer;
+import java.util.Locale;
+import java.util.function.Predicate;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 
 public final class PingClient {
+	//? if >=1.21 {
 	public static final KeyMapping QUICK_PING_KEY = new KeyMapping("key.callouts.quick_ping", InputConstants.KEY_Z, KeyMapping.Category.MULTIPLAYER);
 	public static final KeyMapping WHEEL_KEY = new KeyMapping("key.callouts.ping_wheel", InputConstants.KEY_R, KeyMapping.Category.MULTIPLAYER);
+	//?} else {
+	/*public static final KeyMapping QUICK_PING_KEY = new KeyMapping("key.callouts.quick_ping", InputConstants.KEY_Z, "key.categories.multiplayer");
+	public static final KeyMapping WHEEL_KEY = new KeyMapping("key.callouts.ping_wheel", InputConstants.KEY_R, "key.categories.multiplayer");
+	*///?}
 	public static final PingTracker TRACKER = new PingTracker(() -> System.nanoTime() / 1_000_000L);
 
-	private static Consumer<PingRequestPayload> sender = request -> {};
+	// Returns false when the server can't receive pings (it doesn't have the mod).
+	private static Predicate<PingRequestPayload> sender = request -> false;
+	private static ClientConfig config = new ClientConfig();
 
 	private PingClient() {}
 
-	public static void init(Consumer<PingRequestPayload> serverSender) {
+	public static void init(Predicate<PingRequestPayload> serverSender) {
 		sender = serverSender;
+		config = ClientConfig.load(ModLoaderAccess.INSTANCE.getConfigDir().resolve("callouts-client.properties"));
+	}
+
+	public static ClientConfig config() {
+		return config;
 	}
 
 	public static void tick(Minecraft minecraft) {
@@ -35,9 +51,14 @@ public final class PingClient {
 			sendPing(minecraft, PingCategory.PLAIN);
 		}
 		while (WHEEL_KEY.consumeClick()) {
-			// A tap shorter than a tick is already released here and would leave the wheel stuck open.
-			if (minecraft.gui.screen() == null && WHEEL_KEY.isDown()) {
-				minecraft.gui.setScreen(new PingWheelScreen(WHEEL_KEY));
+			// In hold mode, a tap shorter than a tick is already released here and would leave the wheel stuck open.
+			//? if >=26.2 {
+			if (minecraft.gui.screen() == null && (config.wheelToggle || WHEEL_KEY.isDown())) {
+				minecraft.gui.setScreen(new PingWheelScreen(WHEEL_KEY, config.wheelToggle));
+			//?} else {
+			/*if (minecraft.screen == null && (config.wheelToggle || WHEEL_KEY.isDown())) {
+				minecraft.setScreen(new PingWheelScreen(WHEEL_KEY, config.wheelToggle));
+			*///?}
 				// Opening a screen releases every key; re-read held keys so walking continues.
 				KeyMapping.setAll();
 			}
@@ -46,9 +67,32 @@ public final class PingClient {
 
 	public static void sendPing(Minecraft minecraft, PingCategory category) {
 		PingRequestPayload request = PingTargeting.target(minecraft, category);
-		if (request != null) {
-			sender.accept(request);
+		if (request == null) {
+			fail(Component.translatable("callouts.feedback.nothing_to_ping", Math.round(PingTargeting.maxDistance())));
+		} else if (!sender.test(request)) {
+			fail(Component.translatable("callouts.feedback.server_missing_mod"));
 		}
+	}
+
+	public static void receiveRejection(PingRejectedPayload payload) {
+		fail(switch (payload.reason()) {
+			case PingRejectedPayload.COOLDOWN -> Component.translatable("callouts.feedback.cooldown");
+			case PingRejectedPayload.LOCKED_OUT -> Component.translatable("callouts.feedback.locked_out", String.format(Locale.ROOT, "%.1f", payload.value()));
+			case PingRejectedPayload.TOO_FAR -> Component.translatable("callouts.feedback.too_far", Math.round(payload.value()));
+			default -> Component.translatable("callouts.feedback.rejected");
+		});
+	}
+
+	private static void fail(Component message) {
+		Minecraft minecraft = Minecraft.getInstance();
+		if (minecraft.player != null) {
+			//? if >=1.21 {
+			minecraft.player.sendOverlayMessage(message);
+			//?} else {
+			/*minecraft.player.displayClientMessage(message, true);
+			*///?}
+		}
+		PingSounds.error();
 	}
 
 	public static void receiveConfig(PingConfigSyncPayload payload) {
@@ -60,6 +104,7 @@ public final class PingClient {
 		if (category != null) {
 			TRACKER.ensureLevel(Minecraft.getInstance().level);
 			TRACKER.add(payload.position(), payload.entityId(), category, payload.color());
+			PingSounds.playAt(payload.position());
 		}
 	}
 }

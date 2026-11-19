@@ -32,6 +32,10 @@ stonecutter {
 		}
 
 		match("26.3", "fabric", "neoforge")
+		match("26.2", "fabric", "neoforge")
+		match("26.1", "fabric", "neoforge", version = "26.1.2")
+		// 1.20.1 NeoForge is the Forge 47.1 fork, built with MDG's legacyforge plugin.
+		version("1.20.1-neoforge", "1.20.1").buildscript("build.legacyforge.gradle.kts")
 		vcsVersion = "26.3-fabric"
 	}
 }

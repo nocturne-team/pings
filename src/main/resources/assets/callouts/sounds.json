@@ -1,0 +1,44 @@
+{
+	"ping.click_soft": {
+		"sounds": [
+			"callouts:click_soft"
+		],
+		"subtitle": "subtitles.callouts.ping"
+	},
+	"ping.click_deep": {
+		"sounds": [
+			"callouts:click_deep"
+		],
+		"subtitle": "subtitles.callouts.ping"
+	},
+	"ping.click_retro": {
+		"sounds": [
+			"callouts:click_retro"
+		],
+		"subtitle": "subtitles.callouts.ping"
+	},
+	"ping.focus": {
+		"sounds": [
+			"callouts:focus"
+		],
+		"subtitle": "subtitles.callouts.ping"
+	},
+	"ping.swipe_confirm": {
+		"sounds": [
+			"callouts:swipe_confirm"
+		],
+		"subtitle": "subtitles.callouts.ping"
+	},
+	"ping.chime": {
+		"sounds": [
+			"callouts:chime"
+		],
+		"subtitle": "subtitles.callouts.ping"
+	},
+	"ping.tick": {
+		"sounds": [
+			"callouts:tick"
+		],
+		"subtitle": "subtitles.callouts.ping"
+	}
+}

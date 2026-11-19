@@ -45,6 +45,11 @@ public final class MarkerMath {
 		return Math.max(MIN_SCALE, Math.min(1.0, FULL_SIZE_DISTANCE / distance));
 	}
 
+	public static int withOpacity(int argb, double opacity) {
+		int alpha = (int) Math.round((argb >>> 24) * Math.max(0.0, Math.min(1.0, opacity)));
+		return (alpha << 24) | (argb & 0x00FFFFFF);
+	}
+
 	public static String formatDistance(double blocks) {
 		return blocks < 10 ? String.format(Locale.ROOT, "%.1fm", blocks) : Math.round(blocks) + "m";
 	}

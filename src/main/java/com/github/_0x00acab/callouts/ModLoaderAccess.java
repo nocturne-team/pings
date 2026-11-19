@@ -1,7 +1,9 @@
 package com.github._0x00acab.callouts;
 
 import java.nio.file.Path;
+//? if >=1.21 {
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+//?}
 import net.minecraft.server.level.ServerPlayer;
 
 public sealed interface ModLoaderAccess {
@@ -14,7 +16,15 @@ public sealed interface ModLoaderAccess {
 
 	Path getConfigDir();
 
+	//? if >=1.21 {
 	void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+	//?} else {
+	/*// One of the payload records in the network package.
+	void sendToPlayer(ServerPlayer player, Object payload);
+	*///?}
+
+	// False for vanilla clients, which get VanillaPings instead.
+	boolean hasCallouts(ServerPlayer player);
 
 	//? if fabric {
 	final class FabricLoaderAccess implements ModLoaderAccess {
@@ -29,8 +39,16 @@ public sealed interface ModLoaderAccess {
 				net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, payload);
 			}
 		}
+
+		@Override
+		public boolean hasCallouts(ServerPlayer player) {
+			return net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.canSend(player,
+				com.github._0x00acab.callouts.network.PingBroadcastPayload.TYPE);
+		}
 	}
-	//?} else {
+	//?}
+
+	//? if neoforge && >=1.21 {
 	/*final class NeoForgeLoaderAccess implements ModLoaderAccess {
 		@Override
 		public Path getConfigDir() {
@@ -42,6 +60,30 @@ public sealed interface ModLoaderAccess {
 			if (player.connection.hasChannel(payload)) {
 				net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, payload);
 			}
+		}
+
+		@Override
+		public boolean hasCallouts(ServerPlayer player) {
+			return player.connection.hasChannel(com.github._0x00acab.callouts.network.PingBroadcastPayload.TYPE);
+		}
+	}
+	*///?}
+
+	//? if neoforge && <1.21 {
+	/*final class NeoForgeLoaderAccess implements ModLoaderAccess {
+		@Override
+		public Path getConfigDir() {
+			return net.minecraftforge.fml.loading.FMLPaths.CONFIGDIR.get();
+		}
+
+		@Override
+		public void sendToPlayer(ServerPlayer player, Object payload) {
+			com.github._0x00acab.callouts.network.LegacyNetwork.sendToPlayer(player, payload);
+		}
+
+		@Override
+		public boolean hasCallouts(ServerPlayer player) {
+			return com.github._0x00acab.callouts.network.LegacyNetwork.isPresent(player.connection.connection);
 		}
 	}
 	*///?}
