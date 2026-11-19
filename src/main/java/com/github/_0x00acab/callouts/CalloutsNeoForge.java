@@ -11,6 +11,8 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
@@ -22,6 +24,8 @@ public class CalloutsNeoForge {
 		NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) ->
 			ModLoaderAccess.INSTANCE.sendToPlayer((ServerPlayer) event.getEntity(),
 				new PingConfigSyncPayload(CalloutsMod.config().maxPingDistance())));
+		NeoForge.EVENT_BUS.addListener((ServerTickEvent.Post event) -> CalloutsMod.vanillaPings().tick());
+		NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> CalloutsMod.vanillaPings().clear());
 	}
 
 	private static void registerPayloads(RegisterPayloadHandlersEvent event) {

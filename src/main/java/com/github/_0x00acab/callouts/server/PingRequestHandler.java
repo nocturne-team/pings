@@ -6,6 +6,7 @@ import com.github._0x00acab.callouts.CalloutsConfig;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
 import com.github._0x00acab.callouts.network.PingRejectedPayload;
 import com.github._0x00acab.callouts.network.PingRequestPayload;
+import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -15,11 +16,13 @@ public final class PingRequestHandler {
 	private final CalloutsConfig config;
 	private final PingRateLimiter limiter;
 	private final TeamProvider teams;
+	private final VanillaPings vanillaPings;
 
-	public PingRequestHandler(CalloutsConfig config, PingRateLimiter limiter, TeamProvider teams) {
+	public PingRequestHandler(CalloutsConfig config, PingRateLimiter limiter, TeamProvider teams, VanillaPings vanillaPings) {
 		this.config = config;
 		this.limiter = limiter;
 		this.teams = teams;
+		this.vanillaPings = vanillaPings;
 	}
 
 	public void handle(ServerPlayer sender, PingRequestPayload request) {
@@ -32,12 +35,14 @@ public final class PingRequestHandler {
 		// Range is checked against what was aimed at, not the marker drawn above an entity's head.
 		Vec3 aimed = target;
 		int entityId = PingRequestPayload.NO_ENTITY;
+		Entity pinged = null;
 		if (request.entityId() != PingRequestPayload.NO_ENTITY) {
 			Entity entity = sender.level().getEntity(request.entityId());
 			if (entity != null && !entity.isRemoved() && !entity.isInvisibleTo(sender) && isTrackedBy(sender, entity)) {
 				aimed = entity.position();
 				target = aimed.add(0, entity.getBbHeight() + PingBroadcastPayload.ENTITY_MARKER_OFFSET, 0);
 				entityId = entity.getId();
+				pinged = entity;
 			}
 		}
 
@@ -59,9 +64,18 @@ public final class PingRequestHandler {
 			}
 		}
 
-		PingBroadcastPayload broadcast = new PingBroadcastPayload(target, entityId, category.ordinal(), SenderColor.of(sender));
+		int color = SenderColor.of(sender);
+		PingBroadcastPayload broadcast = new PingBroadcastPayload(target, entityId, category.ordinal(), color);
+		List<ServerPlayer> vanilla = new ArrayList<>();
 		for (ServerPlayer recipient : recipients(sender)) {
-			ModLoaderAccess.INSTANCE.sendToPlayer(recipient, broadcast);
+			if (ModLoaderAccess.INSTANCE.hasCallouts(recipient)) {
+				ModLoaderAccess.INSTANCE.sendToPlayer(recipient, broadcast);
+			} else {
+				vanilla.add(recipient);
+			}
+		}
+		if (config.vanillaFallback() && !vanilla.isEmpty()) {
+			vanillaPings.show(sender, vanilla, target, pinged, category, color);
 		}
 	}
 

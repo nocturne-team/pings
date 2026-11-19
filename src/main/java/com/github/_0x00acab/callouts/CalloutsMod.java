@@ -2,6 +2,7 @@ package com.github._0x00acab.callouts;
 
 import com.github._0x00acab.callouts.server.PingRateLimiter;
 import com.github._0x00acab.callouts.server.PingRequestHandler;
+import com.github._0x00acab.callouts.server.VanillaPings;
 import com.github._0x00acab.callouts.server.VanillaTeamProvider;
 //? if >=1.21 {
 import net.minecraft.resources.Identifier;
@@ -19,6 +20,7 @@ public final class CalloutsMod {
 
 	private static CalloutsConfig config;
 	private static PingRequestHandler requestHandler;
+	private static VanillaPings vanillaPings;
 
 	private CalloutsMod() {}
 
@@ -34,7 +36,8 @@ public final class CalloutsMod {
 
 	public static void init() {
 		config = CalloutsConfig.load(ModLoaderAccess.INSTANCE.getConfigDir().resolve("callouts.properties"));
-		requestHandler = new PingRequestHandler(config, new PingRateLimiter(config, () -> System.nanoTime() / 1_000_000L), new VanillaTeamProvider());
+		vanillaPings = new VanillaPings();
+		requestHandler = new PingRequestHandler(config, new PingRateLimiter(config, () -> System.nanoTime() / 1_000_000L), new VanillaTeamProvider(), vanillaPings);
 		LOGGER.info("Callouts loaded");
 	}
 
@@ -44,5 +47,9 @@ public final class CalloutsMod {
 
 	public static PingRequestHandler requestHandler() {
 		return requestHandler;
+	}
+
+	public static VanillaPings vanillaPings() {
+		return vanillaPings;
 	}
 }

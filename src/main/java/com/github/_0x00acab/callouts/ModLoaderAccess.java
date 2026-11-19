@@ -23,6 +23,9 @@ public sealed interface ModLoaderAccess {
 	void sendToPlayer(ServerPlayer player, Object payload);
 	*///?}
 
+	// False for vanilla clients, which get VanillaPings instead.
+	boolean hasCallouts(ServerPlayer player);
+
 	//? if fabric {
 	final class FabricLoaderAccess implements ModLoaderAccess {
 		@Override
@@ -35,6 +38,12 @@ public sealed interface ModLoaderAccess {
 			if (net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.canSend(player, payload.type())) {
 				net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.send(player, payload);
 			}
+		}
+
+		@Override
+		public boolean hasCallouts(ServerPlayer player) {
+			return net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking.canSend(player,
+				com.github._0x00acab.callouts.network.PingBroadcastPayload.TYPE);
 		}
 	}
 	//?}
@@ -52,6 +61,11 @@ public sealed interface ModLoaderAccess {
 				net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, payload);
 			}
 		}
+
+		@Override
+		public boolean hasCallouts(ServerPlayer player) {
+			return player.connection.hasChannel(com.github._0x00acab.callouts.network.PingBroadcastPayload.TYPE);
+		}
 	}
 	*///?}
 
@@ -65,6 +79,11 @@ public sealed interface ModLoaderAccess {
 		@Override
 		public void sendToPlayer(ServerPlayer player, Object payload) {
 			com.github._0x00acab.callouts.network.LegacyNetwork.sendToPlayer(player, payload);
+		}
+
+		@Override
+		public boolean hasCallouts(ServerPlayer player) {
+			return com.github._0x00acab.callouts.network.LegacyNetwork.isPresent(player.connection.connection);
 		}
 	}
 	*///?}

@@ -8,20 +8,27 @@ import net.minecraft.resources.Identifier;
 *///?}
 
 public enum PingCategory {
-	PLAIN("plain"),
-	DANGER("danger"),
-	LOOK_HERE("look_here"),
-	COME_HERE("come_here"),
-	NEED_HELP("need_help"),
-	MINING("mining");
+	PLAIN("plain", "Ping"),
+	DANGER("danger", "Danger"),
+	LOOK_HERE("look_here", "Look Here"),
+	COME_HERE("come_here", "Come Here"),
+	NEED_HELP("need_help", "Need Help"),
+	MINING("mining", "Mining/Resource");
 
 	public static final List<PingCategory> WHEEL = List.of(DANGER, LOOK_HERE, COME_HERE, NEED_HELP, MINING);
 	private static final PingCategory[] BY_ID = values();
 
 	private final String key;
+	private final String englishName;
 
-	PingCategory(String key) {
+	PingCategory(String key, String englishName) {
 		this.key = key;
+		this.englishName = englishName;
+	}
+
+	// For vanilla clients, which don't have the mod's lang files.
+	public String englishName() {
+		return englishName;
 	}
 
 	public static PingCategory byId(int id) {

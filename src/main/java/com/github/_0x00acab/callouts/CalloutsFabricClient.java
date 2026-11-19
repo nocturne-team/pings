@@ -1,6 +1,7 @@
 package com.github._0x00acab.callouts;
 
 //? if fabric {
+import com.github._0x00acab.callouts.client.ExordiumCompat;
 import com.github._0x00acab.callouts.client.PingClient;
 import com.github._0x00acab.callouts.client.PingHud;
 import com.github._0x00acab.callouts.network.PingBroadcastPayload;
@@ -26,7 +27,10 @@ public class CalloutsFabricClient implements ClientModInitializer {
 		});
 		KeyMappingHelper.registerKeyMapping(PingClient.QUICK_PING_KEY);
 		KeyMappingHelper.registerKeyMapping(PingClient.WHEEL_KEY);
-		ClientTickEvents.END_CLIENT_TICK.register(PingClient::tick);
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			ExordiumCompat.tryInstall();
+			PingClient.tick(client);
+		});
 		ClientPlayNetworking.registerGlobalReceiver(PingBroadcastPayload.TYPE, (payload, context) -> PingClient.receive(payload));
 		ClientPlayNetworking.registerGlobalReceiver(PingConfigSyncPayload.TYPE, (payload, context) -> PingClient.receiveConfig(payload));
 		ClientPlayNetworking.registerGlobalReceiver(PingRejectedPayload.TYPE, (payload, context) -> PingClient.receiveRejection(payload));

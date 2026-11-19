@@ -13,9 +13,10 @@ public record CalloutsConfig(
 	long burstWindowMillis,
 	long lockoutQuietMillis,
 	double noTeamRadius,
-	double maxPingDistance
+	double maxPingDistance,
+	boolean vanillaFallback
 ) {
-	public static final CalloutsConfig DEFAULTS = new CalloutsConfig(1000L, 4, 3000L, 5000L, 128.0, 256.0);
+	public static final CalloutsConfig DEFAULTS = new CalloutsConfig(1000L, 4, 3000L, 5000L, 128.0, 256.0, true);
 
 	public static CalloutsConfig load(Path file) {
 		if (!Files.exists(file)) {
@@ -35,7 +36,8 @@ public record CalloutsConfig(
 			readLong(props, "burst_window_millis", DEFAULTS.burstWindowMillis, 0),
 			readLong(props, "lockout_quiet_millis", DEFAULTS.lockoutQuietMillis, 0),
 			readPositiveDouble(props, "no_team_radius", DEFAULTS.noTeamRadius),
-			readPositiveDouble(props, "max_ping_distance", DEFAULTS.maxPingDistance));
+			readPositiveDouble(props, "max_ping_distance", DEFAULTS.maxPingDistance),
+			readBoolean(props, "vanilla_fallback", DEFAULTS.vanillaFallback));
 	}
 
 	private static void save(Path file, CalloutsConfig config) {
@@ -46,6 +48,7 @@ public record CalloutsConfig(
 		props.setProperty("lockout_quiet_millis", Long.toString(config.lockoutQuietMillis));
 		props.setProperty("no_team_radius", Double.toString(config.noTeamRadius));
 		props.setProperty("max_ping_distance", Double.toString(config.maxPingDistance));
+		props.setProperty("vanilla_fallback", Boolean.toString(config.vanillaFallback));
 		try {
 			Files.createDirectories(file.getParent());
 			try (Writer writer = Files.newBufferedWriter(file)) {
@@ -67,6 +70,19 @@ public record CalloutsConfig(
 				return value;
 			}
 		} catch (NumberFormatException ignored) {
+		}
+		CalloutsMod.LOGGER.warn("Ignoring invalid {}={} in callouts config", key, raw);
+		return fallback;
+	}
+
+	private static boolean readBoolean(Properties props, String key, boolean fallback) {
+		String raw = props.getProperty(key);
+		if (raw == null) {
+			return fallback;
+		}
+		String value = raw.trim();
+		if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+			return Boolean.parseBoolean(value);
 		}
 		CalloutsMod.LOGGER.warn("Ignoring invalid {}={} in callouts config", key, raw);
 		return fallback;
