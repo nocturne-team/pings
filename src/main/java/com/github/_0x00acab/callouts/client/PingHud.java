@@ -10,6 +10,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
+//? if >=26.4-alpha {
+/*import net.minecraft.client.gui.GuiPipeline;
+*///?} else
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.GameRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -28,6 +31,10 @@ public final class PingHud {
 
 	private PingHud() {}
 
+	//? if >=26.4-alpha {
+	/*public static void render(GuiGraphicsExtractor graphics) {
+		DeltaTracker deltaTracker = graphics.deltaTracker();
+	*///?} else
 	public static void render(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
 		Minecraft minecraft = Minecraft.getInstance();
 		ClientLevel level = minecraft.level;
@@ -106,6 +113,9 @@ public final class PingHud {
 			// Odd-sized icon on an even-sized diamond: shift by half a pixel so it sits dead center.
 			pose.pushMatrix();
 			pose.translate(-ICON / 2f, -ICON / 2f);
+			//? if >=26.4-alpha {
+			/*graphics.blitSprite(GuiPipeline.TEXTURED, category.markerSprite(), 0, 0, ICON, ICON, (color & 0xFF000000) | 0x00FFFFFF);
+			*///?} else
 			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, category.markerSprite(), 0, 0, ICON, ICON, (color & 0xFF000000) | 0x00FFFFFF);
 			pose.popMatrix();
 		}

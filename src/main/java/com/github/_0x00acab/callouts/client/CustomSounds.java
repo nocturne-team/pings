@@ -144,12 +144,17 @@ public final class CustomSounds {
 
 		// Builds the event in place of a sounds.json lookup, and puts the decoded file where the engine looks for it.
 		@Override
-		//? if >=26.3 {
+		//? if >=26.4-alpha {
+		/*public boolean resolveAndSelectSound(SoundManager manager) {
+		*///?} else if >=26.3 {
 		public WeighedSoundEvents getOrResolve(SoundManager manager) {
 		//?} else
 		//public WeighedSoundEvents resolve(SoundManager manager) {
 			//? if >=1.21 {
 			sound = new Sound(identifier, ConstantFloat.of(1.0f), ConstantFloat.of(1.0f), 1, Sound.Type.FILE, false, false, 16);
+			//? if >=26.4-alpha {
+			/*WeighedSoundEvents events = new WeighedSoundEvents(net.minecraft.network.chat.Component.translatable("subtitles.callouts.ping"));
+			*///?} else
 			WeighedSoundEvents events = new WeighedSoundEvents(identifier, "subtitles.callouts.ping");
 			//?} else {
 			/*// Streamed, so the engine asks getStream below for the audio.
@@ -163,6 +168,9 @@ public final class CustomSounds {
 			Minecraft.getInstance().getSoundManager().soundEngine.soundBuffers.cache
 				.computeIfAbsent(sound.getPath(), key -> CompletableFuture.supplyAsync(() -> decode(file), Util.nonCriticalIoPool()));
 			//?}
+			//? if >=26.4-alpha {
+			/*return true;
+			*///?} else
 			return events;
 		}
 

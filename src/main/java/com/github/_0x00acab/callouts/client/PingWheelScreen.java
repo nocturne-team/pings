@@ -9,6 +9,9 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.debug.GameModeSwitcherScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+//? if >=26.4-alpha {
+/*import net.minecraft.client.gui.GuiPipeline;
+*///?} else
 import net.minecraft.client.renderer.RenderPipelines;
 //?} else {
 /*import com.mojang.blaze3d.platform.InputConstants;
@@ -51,7 +54,16 @@ public final class PingWheelScreen extends Screen {
 		return false;
 	}
 
-	//? if >=1.21 {
+	//? if >=26.4-alpha {
+	/*@Override
+	public void extractBackground(GuiGraphicsExtractor graphics) {
+	}
+
+	@Override
+	public void extractRenderState(GuiGraphicsExtractor graphics) {
+		int mouseX = graphics.mouseX();
+		int mouseY = graphics.mouseY();
+	*///?} else if >=1.21 {
 	@Override
 	public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
 	}
@@ -76,6 +88,9 @@ public final class PingWheelScreen extends Screen {
 			boolean selected = category == hovered;
 			graphics.fill(x - TILE_HALF, y - TILE_HALF, x + TILE_HALF, y + TILE_HALF, selected ? 0xC0FFFFFF : 0x90000000);
 			//? if >=1.21 {
+			//? if >=26.4-alpha {
+			/*graphics.blitSprite(GuiPipeline.TEXTURED, category.sprite(), x - ICON / 2, y - ICON / 2, ICON, ICON);
+			*///?} else
 			graphics.blitSprite(RenderPipelines.GUI_TEXTURED, category.sprite(), x - ICON / 2, y - ICON / 2, ICON, ICON);
 			graphics.centeredText(font, Component.translatable(category.translationKey()), x, y + TILE_HALF + 3, selected ? 0xFFFFFF55 : 0xFFFFFFFF);
 			//?} else {

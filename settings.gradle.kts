@@ -31,6 +31,8 @@ stonecutter {
 			for (loader in loaders) version("$project-$loader", version).buildscript("build.$loader.gradle.kts")
 		}
 
+		// Fabric only: NeoForge doesn't ship snapshot builds.
+		version("26.4-fabric", "26.4-snapshot-10").buildscript("build.fabric.gradle.kts")
 		match("26.3", "fabric", "neoforge")
 		match("26.2", "fabric", "neoforge")
 		match("26.1", "fabric", "neoforge", version = "26.1.2")

@@ -191,6 +191,9 @@ public final class SoundPickerScreen extends Screen {
 
 			//? if >=1.21 {
 			@Override
+			//? if >=26.4-alpha {
+			/*public void extractContent(GuiGraphicsExtractor graphics, boolean hovered) {
+			*///?} else
 			public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float partialTick) {
 				graphics.centeredText(font, label, getContentXMiddle(), getContentYMiddle() - font.lineHeight / 2, 0xFFFFFFFF);
 			}
